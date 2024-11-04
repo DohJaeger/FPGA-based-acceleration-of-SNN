@@ -13,11 +13,12 @@ import org.scalatest.freespec.AnyFreeSpec
 import java.io.File
 import java.io.PrintWriter
 
+//MultiMemory
 class MultiMemory(depth: Int, width: Int, numMemories: Int) extends Module {
   val io = IO(new Bundle {
-    val rdAddr = Input(UInt(log2Ceil(depth).W))
+    val rdAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))
     val rdData = Output(Vec(numMemories, UInt(width.W)))
-    val wrAddr = Input(UInt(log2Ceil(depth).W))
+    val wrAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))
     val wrData = Input(Vec(numMemories, UInt(width.W)))
     val wrEna = Input(Vec(numMemories, Bool()))
     val rdEna = Input(Vec(numMemories, Bool()))
@@ -32,10 +33,10 @@ class MultiMemory(depth: Int, width: Int, numMemories: Int) extends Module {
   // Handle read and write operations for each memory
   for (i <- 0 until numMemories) {
     when(io.rdEna(i)) {
-      io.rdData(i) := mems(i).read(io.rdAddr)
+      io.rdData(i) := mems(i).read(io.rdAddr(i))
     }
     when(io.wrEna(i)) {
-      mems(i).write(io.wrAddr, io.wrData(i))
+      mems(i).write(io.wrAddr(i), io.wrData(i))
     }
   }
 }

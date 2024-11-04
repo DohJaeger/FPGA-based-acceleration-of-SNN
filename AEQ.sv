@@ -56,7 +56,7 @@
 `endif // not def SYNTHESIS
 
 // VCS coverage exclude_file
-module mems_256x11(	// src/main/scala/multi_sync_mem.scala:27:47
+module mems_256x11(	// src/main/scala/multi_sync_mem.scala:28:47
   input  [7:0]  R0_addr,
   input         R0_en,
                 R0_clk,
@@ -67,167 +67,184 @@ module mems_256x11(	// src/main/scala/multi_sync_mem.scala:27:47
   input  [10:0] W0_data
 );
 
-  reg [10:0] Memory[0:255];	// src/main/scala/multi_sync_mem.scala:27:47
-  reg        _R0_en_d0;	// src/main/scala/multi_sync_mem.scala:27:47
-  reg [7:0]  _R0_addr_d0;	// src/main/scala/multi_sync_mem.scala:27:47
-  always @(posedge R0_clk) begin	// src/main/scala/multi_sync_mem.scala:27:47
-    _R0_en_d0 <= R0_en;	// src/main/scala/multi_sync_mem.scala:27:47
-    _R0_addr_d0 <= R0_addr;	// src/main/scala/multi_sync_mem.scala:27:47
+  reg [10:0] Memory[0:255];	// src/main/scala/multi_sync_mem.scala:28:47
+  reg        _R0_en_d0;	// src/main/scala/multi_sync_mem.scala:28:47
+  reg [7:0]  _R0_addr_d0;	// src/main/scala/multi_sync_mem.scala:28:47
+  always @(posedge R0_clk) begin	// src/main/scala/multi_sync_mem.scala:28:47
+    _R0_en_d0 <= R0_en;	// src/main/scala/multi_sync_mem.scala:28:47
+    _R0_addr_d0 <= R0_addr;	// src/main/scala/multi_sync_mem.scala:28:47
   end // always @(posedge)
-  always @(posedge W0_clk) begin	// src/main/scala/multi_sync_mem.scala:27:47
-    if (W0_en & 1'h1)	// src/main/scala/multi_sync_mem.scala:27:47
-      Memory[W0_addr] <= W0_data;	// src/main/scala/multi_sync_mem.scala:27:47
+  always @(posedge W0_clk) begin	// src/main/scala/multi_sync_mem.scala:28:47
+    if (W0_en & 1'h1)	// src/main/scala/multi_sync_mem.scala:28:47
+      Memory[W0_addr] <= W0_data;	// src/main/scala/multi_sync_mem.scala:28:47
   end // always @(posedge)
-  `ifdef ENABLE_INITIAL_MEM_	// src/main/scala/multi_sync_mem.scala:27:47
-    `ifdef RANDOMIZE_REG_INIT	// src/main/scala/multi_sync_mem.scala:27:47
-      reg [31:0] _RANDOM;	// src/main/scala/multi_sync_mem.scala:27:47
+  `ifdef ENABLE_INITIAL_MEM_	// src/main/scala/multi_sync_mem.scala:28:47
+    `ifdef RANDOMIZE_REG_INIT	// src/main/scala/multi_sync_mem.scala:28:47
+      reg [31:0] _RANDOM;	// src/main/scala/multi_sync_mem.scala:28:47
     `endif // RANDOMIZE_REG_INIT
-    reg [31:0] _RANDOM_MEM;	// src/main/scala/multi_sync_mem.scala:27:47
-    initial begin	// src/main/scala/multi_sync_mem.scala:27:47
-      `INIT_RANDOM_PROLOG_	// src/main/scala/multi_sync_mem.scala:27:47
-      `ifdef RANDOMIZE_MEM_INIT	// src/main/scala/multi_sync_mem.scala:27:47
+    reg [31:0] _RANDOM_MEM;	// src/main/scala/multi_sync_mem.scala:28:47
+    initial begin	// src/main/scala/multi_sync_mem.scala:28:47
+      `INIT_RANDOM_PROLOG_	// src/main/scala/multi_sync_mem.scala:28:47
+      `ifdef RANDOMIZE_MEM_INIT	// src/main/scala/multi_sync_mem.scala:28:47
         for (logic [8:0] i = 9'h0; i < 9'h100; i += 9'h1) begin
-          _RANDOM_MEM = `RANDOM;	// src/main/scala/multi_sync_mem.scala:27:47
-          Memory[i[7:0]] = _RANDOM_MEM[10:0];	// src/main/scala/multi_sync_mem.scala:27:47
-        end	// src/main/scala/multi_sync_mem.scala:27:47
+          _RANDOM_MEM = `RANDOM;	// src/main/scala/multi_sync_mem.scala:28:47
+          Memory[i[7:0]] = _RANDOM_MEM[10:0];	// src/main/scala/multi_sync_mem.scala:28:47
+        end	// src/main/scala/multi_sync_mem.scala:28:47
       `endif // RANDOMIZE_MEM_INIT
-      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/multi_sync_mem.scala:27:47
-        _RANDOM = {`RANDOM};	// src/main/scala/multi_sync_mem.scala:27:47
-        _R0_en_d0 = _RANDOM[0];	// src/main/scala/multi_sync_mem.scala:27:47
-        _R0_addr_d0 = _RANDOM[8:1];	// src/main/scala/multi_sync_mem.scala:27:47
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/multi_sync_mem.scala:28:47
+        _RANDOM = {`RANDOM};	// src/main/scala/multi_sync_mem.scala:28:47
+        _R0_en_d0 = _RANDOM[0];	// src/main/scala/multi_sync_mem.scala:28:47
+        _R0_addr_d0 = _RANDOM[8:1];	// src/main/scala/multi_sync_mem.scala:28:47
       `endif // RANDOMIZE_REG_INIT
     end // initial
   `endif // ENABLE_INITIAL_MEM_
-  assign R0_data = _R0_en_d0 ? Memory[_R0_addr_d0] : 11'bx;	// src/main/scala/multi_sync_mem.scala:27:47
+  assign R0_data = _R0_en_d0 ? Memory[_R0_addr_d0] : 11'bx;	// src/main/scala/multi_sync_mem.scala:28:47
 endmodule
 
-module MultiMemory(	// src/main/scala/multi_sync_mem.scala:16:7
-  input         clock,	// src/main/scala/multi_sync_mem.scala:16:7
-  output [10:0] io_rdData_0,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_1,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_2,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_3,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_4,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_5,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_6,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_7,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdData_8,	// src/main/scala/multi_sync_mem.scala:17:14
-  input  [7:0]  io_wrAddr,	// src/main/scala/multi_sync_mem.scala:17:14
-  input  [10:0] io_wrData_0,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_1,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_2,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_3,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_4,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_5,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_6,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_7,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrData_8,	// src/main/scala/multi_sync_mem.scala:17:14
-  input         io_wrEna_0,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_1,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_2,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_3,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_4,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_5,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_6,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_7,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_wrEna_8,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_0,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_1,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_2,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_3,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_4,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_5,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_6,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_7,	// src/main/scala/multi_sync_mem.scala:17:14
-                io_rdEna_8	// src/main/scala/multi_sync_mem.scala:17:14
+module MultiMemory(	// src/main/scala/multi_sync_mem.scala:17:7
+  input         clock,	// src/main/scala/multi_sync_mem.scala:17:7
+  input  [7:0]  io_rdAddr_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdAddr_8,	// src/main/scala/multi_sync_mem.scala:18:14
+  output [10:0] io_rdData_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdData_8,	// src/main/scala/multi_sync_mem.scala:18:14
+  input  [7:0]  io_wrAddr_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrAddr_8,	// src/main/scala/multi_sync_mem.scala:18:14
+  input  [10:0] io_wrData_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrData_8,	// src/main/scala/multi_sync_mem.scala:18:14
+  input         io_wrEna_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_wrEna_8,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_0,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_1,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_2,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_3,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_4,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_5,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_6,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_7,	// src/main/scala/multi_sync_mem.scala:18:14
+                io_rdEna_8	// src/main/scala/multi_sync_mem.scala:18:14
 );
 
-  mems_256x11 mems_0_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_0_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_0),
     .R0_en   (io_rdEna_0),
     .R0_clk  (clock),
     .R0_data (io_rdData_0),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_0),
     .W0_en   (io_wrEna_0),
     .W0_clk  (clock),
     .W0_data (io_wrData_0)
   );
-  mems_256x11 mems_1_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_1_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_1),
     .R0_en   (io_rdEna_1),
     .R0_clk  (clock),
     .R0_data (io_rdData_1),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_1),
     .W0_en   (io_wrEna_1),
     .W0_clk  (clock),
     .W0_data (io_wrData_1)
   );
-  mems_256x11 mems_2_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_2_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_2),
     .R0_en   (io_rdEna_2),
     .R0_clk  (clock),
     .R0_data (io_rdData_2),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_2),
     .W0_en   (io_wrEna_2),
     .W0_clk  (clock),
     .W0_data (io_wrData_2)
   );
-  mems_256x11 mems_3_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_3_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_3),
     .R0_en   (io_rdEna_3),
     .R0_clk  (clock),
     .R0_data (io_rdData_3),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_3),
     .W0_en   (io_wrEna_3),
     .W0_clk  (clock),
     .W0_data (io_wrData_3)
   );
-  mems_256x11 mems_4_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_4_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_4),
     .R0_en   (io_rdEna_4),
     .R0_clk  (clock),
     .R0_data (io_rdData_4),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_4),
     .W0_en   (io_wrEna_4),
     .W0_clk  (clock),
     .W0_data (io_wrData_4)
   );
-  mems_256x11 mems_5_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_5_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_5),
     .R0_en   (io_rdEna_5),
     .R0_clk  (clock),
     .R0_data (io_rdData_5),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_5),
     .W0_en   (io_wrEna_5),
     .W0_clk  (clock),
     .W0_data (io_wrData_5)
   );
-  mems_256x11 mems_6_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_6_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_6),
     .R0_en   (io_rdEna_6),
     .R0_clk  (clock),
     .R0_data (io_rdData_6),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_6),
     .W0_en   (io_wrEna_6),
     .W0_clk  (clock),
     .W0_data (io_wrData_6)
   );
-  mems_256x11 mems_7_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_7_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_7),
     .R0_en   (io_rdEna_7),
     .R0_clk  (clock),
     .R0_data (io_rdData_7),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_7),
     .W0_en   (io_wrEna_7),
     .W0_clk  (clock),
     .W0_data (io_wrData_7)
   );
-  mems_256x11 mems_8_ext (	// src/main/scala/multi_sync_mem.scala:27:47
-    .R0_addr (8'h0),	// src/main/scala/multi_sync_mem.scala:17:14
+  mems_256x11 mems_8_ext (	// src/main/scala/multi_sync_mem.scala:28:47
+    .R0_addr (io_rdAddr_8),
     .R0_en   (io_rdEna_8),
     .R0_clk  (clock),
     .R0_data (io_rdData_8),
-    .W0_addr (io_wrAddr),
+    .W0_addr (io_wrAddr_8),
     .W0_en   (io_wrEna_8),
     .W0_clk  (clock),
     .W0_data (io_wrData_8)
@@ -285,6 +302,8 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
   reg  [7:0]  writeCounters_6;	// src/main/scala/aeq.scala:55:30
   reg  [7:0]  writeCounters_7;	// src/main/scala/aeq.scala:55:30
   reg  [7:0]  writeCounters_8;	// src/main/scala/aeq.scala:55:30
+  reg  [7:0]  readCounter;	// src/main/scala/aeq.scala:56:28
+  wire [7:0]  _GEN = io_readEnable ? readCounter : 8'h0;	// src/main/scala/aeq.scala:55:38, :56:28, :63:22, :70:23, :73:29
   always @(posedge clock) begin	// src/main/scala/aeq.scala:45:7
     if (reset) begin	// src/main/scala/aeq.scala:45:7
       writeCounters_0 <= 8'h0;	// src/main/scala/aeq.scala:55:{30,38}
@@ -296,26 +315,29 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
       writeCounters_6 <= 8'h0;	// src/main/scala/aeq.scala:55:{30,38}
       writeCounters_7 <= 8'h0;	// src/main/scala/aeq.scala:55:{30,38}
       writeCounters_8 <= 8'h0;	// src/main/scala/aeq.scala:55:{30,38}
+      readCounter <= 8'h0;	// src/main/scala/aeq.scala:55:38, :56:28
     end
     else begin	// src/main/scala/aeq.scala:45:7
       if (io_writeEnable_0)	// src/main/scala/aeq.scala:46:14
-        writeCounters_0 <= writeCounters_0 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_0 <= writeCounters_0 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_1)	// src/main/scala/aeq.scala:46:14
-        writeCounters_1 <= writeCounters_1 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_1 <= writeCounters_1 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_2)	// src/main/scala/aeq.scala:46:14
-        writeCounters_2 <= writeCounters_2 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_2 <= writeCounters_2 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_3)	// src/main/scala/aeq.scala:46:14
-        writeCounters_3 <= writeCounters_3 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_3 <= writeCounters_3 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_4)	// src/main/scala/aeq.scala:46:14
-        writeCounters_4 <= writeCounters_4 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_4 <= writeCounters_4 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_5)	// src/main/scala/aeq.scala:46:14
-        writeCounters_5 <= writeCounters_5 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_5 <= writeCounters_5 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_6)	// src/main/scala/aeq.scala:46:14
-        writeCounters_6 <= writeCounters_6 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_6 <= writeCounters_6 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_7)	// src/main/scala/aeq.scala:46:14
-        writeCounters_7 <= writeCounters_7 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_7 <= writeCounters_7 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
       if (io_writeEnable_8)	// src/main/scala/aeq.scala:46:14
-        writeCounters_8 <= writeCounters_8 + 8'h1;	// src/main/scala/aeq.scala:55:30, :91:44
+        writeCounters_8 <= writeCounters_8 + 8'h1;	// src/main/scala/aeq.scala:55:30, :76:32, :92:44
+      if (io_readEnable)	// src/main/scala/aeq.scala:46:14
+        readCounter <= readCounter + 8'h1;	// src/main/scala/aeq.scala:56:28, :76:32
     end
   end // always @(posedge)
   `ifdef ENABLE_INITIAL_REG_	// src/main/scala/aeq.scala:45:7
@@ -340,6 +362,7 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
         writeCounters_6 = _RANDOM[2'h1][23:16];	// src/main/scala/aeq.scala:45:7, :55:30
         writeCounters_7 = _RANDOM[2'h1][31:24];	// src/main/scala/aeq.scala:45:7, :55:30
         writeCounters_8 = _RANDOM[2'h2][7:0];	// src/main/scala/aeq.scala:45:7, :55:30
+        readCounter = _RANDOM[2'h2][15:8];	// src/main/scala/aeq.scala:45:7, :55:30, :56:28
       `endif // RANDOMIZE_REG_INIT
     end // initial
     `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/aeq.scala:45:7
@@ -348,6 +371,15 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
   `endif // ENABLE_INITIAL_REG_
   MultiMemory multiMem (	// src/main/scala/aeq.scala:53:24
     .clock       (clock),
+    .io_rdAddr_0 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_1 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_2 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_3 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_4 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_5 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_6 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_7 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
+    .io_rdAddr_8 (_GEN),	// src/main/scala/aeq.scala:63:22, :70:23, :73:29
     .io_rdData_0 (_multiMem_io_rdData_0),
     .io_rdData_1 (_multiMem_io_rdData_1),
     .io_rdData_2 (_multiMem_io_rdData_2),
@@ -357,33 +389,24 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
     .io_rdData_6 (_multiMem_io_rdData_6),
     .io_rdData_7 (_multiMem_io_rdData_7),
     .io_rdData_8 (_multiMem_io_rdData_8),
-    .io_wrAddr
-      (io_writeEnable_8
-         ? writeCounters_8
-         : io_writeEnable_7
-             ? writeCounters_7
-             : io_writeEnable_6
-                 ? writeCounters_6
-                 : io_writeEnable_5
-                     ? writeCounters_5
-                     : io_writeEnable_4
-                         ? writeCounters_4
-                         : io_writeEnable_3
-                             ? writeCounters_3
-                             : io_writeEnable_2
-                                 ? writeCounters_2
-                                 : io_writeEnable_1
-                                     ? writeCounters_1
-                                     : io_writeEnable_0 ? writeCounters_0 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :86:29, :92:48
-    .io_wrData_0 (io_writeEnable_0 ? {&writeCounters_0, io_writeData_0, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_1 (io_writeEnable_1 ? {&writeCounters_1, io_writeData_1, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_2 (io_writeEnable_2 ? {&writeCounters_2, io_writeData_2, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_3 (io_writeEnable_3 ? {&writeCounters_3, io_writeData_3, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_4 (io_writeEnable_4 ? {&writeCounters_4, io_writeData_4, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_5 (io_writeEnable_5 ? {&writeCounters_5, io_writeData_5, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_6 (io_writeEnable_6 ? {&writeCounters_6, io_writeData_6, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_7 (io_writeEnable_7 ? {&writeCounters_7, io_writeData_7, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
-    .io_wrData_8 (io_writeEnable_8 ? {&writeCounters_8, io_writeData_8, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :86:29, :87:21, :89:29, :92:{29,48}, :93:27, :95:31
+    .io_wrAddr_0 (io_writeEnable_0 ? writeCounters_0 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_1 (io_writeEnable_1 ? writeCounters_1 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_2 (io_writeEnable_2 ? writeCounters_2 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_3 (io_writeEnable_3 ? writeCounters_3 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_4 (io_writeEnable_4 ? writeCounters_4 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_5 (io_writeEnable_5 ? writeCounters_5 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_6 (io_writeEnable_6 ? writeCounters_6 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_7 (io_writeEnable_7 ? writeCounters_7 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrAddr_8 (io_writeEnable_8 ? writeCounters_8 : 8'h0),	// src/main/scala/aeq.scala:55:{30,38}, :64:22, :87:29, :93:48
+    .io_wrData_0 (io_writeEnable_0 ? {&writeCounters_0, io_writeData_0, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_1 (io_writeEnable_1 ? {&writeCounters_1, io_writeData_1, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_2 (io_writeEnable_2 ? {&writeCounters_2, io_writeData_2, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_3 (io_writeEnable_3 ? {&writeCounters_3, io_writeData_3, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_4 (io_writeEnable_4 ? {&writeCounters_4, io_writeData_4, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_5 (io_writeEnable_5 ? {&writeCounters_5, io_writeData_5, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_6 (io_writeEnable_6 ? {&writeCounters_6, io_writeData_6, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_7 (io_writeEnable_7 ? {&writeCounters_7, io_writeData_7, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
+    .io_wrData_8 (io_writeEnable_8 ? {&writeCounters_8, io_writeData_8, 1'h1} : 11'h0),	// src/main/scala/aeq.scala:55:30, :65:{22,32}, :71:33, :87:29, :88:21, :90:29, :93:{29,48}, :94:27, :96:31
     .io_wrEna_0  (io_writeEnable_0),
     .io_wrEna_1  (io_writeEnable_1),
     .io_wrEna_2  (io_writeEnable_2),
@@ -403,14 +426,14 @@ module AEQ(	// src/main/scala/aeq.scala:45:7
     .io_rdEna_7  (io_readEnable),
     .io_rdEna_8  (io_readEnable)
   );
-  assign io_readData_0 = _multiMem_io_rdData_0[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_1 = _multiMem_io_rdData_1[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_2 = _multiMem_io_rdData_2[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_3 = _multiMem_io_rdData_3[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_4 = _multiMem_io_rdData_4[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_5 = _multiMem_io_rdData_5[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_6 = _multiMem_io_rdData_6[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_7 = _multiMem_io_rdData_7[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
-  assign io_readData_8 = _multiMem_io_rdData_8[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :73:46
+  assign io_readData_0 = _multiMem_io_rdData_0[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_1 = _multiMem_io_rdData_1[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_2 = _multiMem_io_rdData_2[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_3 = _multiMem_io_rdData_3[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_4 = _multiMem_io_rdData_4[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_5 = _multiMem_io_rdData_5[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_6 = _multiMem_io_rdData_6[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_7 = _multiMem_io_rdData_7[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
+  assign io_readData_8 = _multiMem_io_rdData_8[9:1];	// src/main/scala/aeq.scala:45:7, :53:24, :74:46
 endmodule
 

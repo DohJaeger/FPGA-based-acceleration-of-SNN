@@ -14,6 +14,8 @@ import org.scalatest.freespec.AnyFreeSpec
 import java.io.File
 import java.io.PrintWriter
 
+
+//Just to test the generation of BRAM
  class Memory (depth : Int , width : Int) extends Module {
  val io = IO(new Bundle {
  val rdAddr = Input(UInt(log2Ceil(depth).W))
