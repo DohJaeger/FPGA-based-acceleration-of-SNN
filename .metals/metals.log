@@ -2078,3 +2078,70 @@ coursierapi.error.SimpleResolutionError$1: Error downloading org.scalameta:mtags
 2024.11.04 11:49:25 WARN  unsupported Scala 2.13.12
 2024.11.04 11:49:25 WARN  unsupported Scala 2.13.12
 2024.11.04 11:49:25 WARN  unsupported Scala 2.13.12
+2024.11.04 23:22:28 INFO  Shutting down server
+2024.11.04 23:22:28 INFO  shutting down Metals
+2024.11.04 23:22:28 INFO  Shut down connection with build server.
+2024.11.04 23:22:28 INFO  Shut down connection with build server.
+2024.11.04 23:22:28 INFO  Exiting server
+2024.11.10 15:26:45 INFO  Started: Metals version 1.4.0 in folders '/home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul' for client Visual Studio Code 1.95.1.
+2024.11.10 15:26:45 WARN  Flyway upgrade recommended: H2 2.3.232 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.224.
+2024.11.10 15:26:45 INFO  no build target found for /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/src/main/scala/conv_pipelined.scala. Using presentation compiler with project's scala-library version: 3.3.4
+2024.11.10 15:26:46 INFO  Attempting to connect to the build server...
+2024.11.10 15:26:46 INFO  No running Bloop server found, starting one.
+2024.11.10 15:26:49 INFO  no build target found for /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/src/main/scala/conv_pipelined.scala. Using presentation compiler with project's scala-library version: 3.3.4
+2024.11.10 15:27:58 INFO  Starting compilation server
+2024.11.10 15:27:58 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/.metals/bsp.trace.json or /home/rahul/.cache/metals/bsp.trace.json
+2024.11.10 15:27:59 INFO  Attempting to connect to the build server...
+2024.11.10 15:27:59 INFO  Found a Bloop server running
+2024.11.10 15:27:59 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/project/.metals/bsp.trace.json or /home/rahul/.cache/metals/bsp.trace.json
+2024.11.10 15:27:58 INFO  time: Connected to build server in 1m12s
+2024.11.10 15:27:58 INFO  Connected to Build server: Bloop v2.0.3
+2024.11.10 15:27:58 INFO  time: Imported build in 0.12s
+2024.11.10 15:27:58 INFO  running doctor check
+2024.11.10 15:27:58 INFO  java targets: chisel_snn_rahul-test, chisel_snn_rahul-build, chisel_snn_rahul
+2024.11.10 15:28:39 WARN  Flyway upgrade recommended: H2 2.3.232 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.224.
+2024.11.10 15:28:39 INFO  time: indexed workspace in 40s
+2024.11.10 15:33:49 INFO  compiling chisel_snn_rahul (9 scala sources)
+2024.11.10 15:33:56 INFO  time: compiled chisel_snn_rahul in 6.95s
+2024.11.10 15:36:15 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.10 15:36:15 INFO  time: compiled chisel_snn_rahul in 0.43s
+2024.11.10 15:36:24 INFO  compiling chisel_snn_rahul (1 scala source)
+Nov 10, 2024 3:36:24 PM scala.meta.internal.pc.CompilerAccess retryWithCleanCompiler
+INFO: compiler crashed due to an error in the Scala compiler, retrying with new compiler instance.
+Nov 10, 2024 3:36:24 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: A severe compiler error occurred, full details of the error can be found in the error report /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/.metals/.reports/metals-full/2024-11-10/r_compiler-error_(chisel_snn_rahul)_15-36-24-418.md
+2024.11.10 15:36:24 INFO  time: compiled chisel_snn_rahul in 0.45s
+2024.11.11 17:34:49 INFO  Shutting down server
+2024.11.11 17:34:49 INFO  shutting down Metals
+2024.11.11 17:34:49 INFO  Shut down connection with build server.
+2024.11.11 17:34:49 INFO  Shut down connection with build server.
+2024.11.11 17:34:49 INFO  Exiting server
+2024.11.12 14:03:41 INFO  Started: Metals version 1.4.0 in folders '/home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul' for client Visual Studio Code 1.95.1.
+2024.11.12 14:03:41 WARN  Flyway upgrade recommended: H2 2.3.232 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.224.
+2024.11.12 14:03:42 INFO  no build target found for /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/src/main/scala/conv_pipelined.scala. Using presentation compiler with project's scala-library version: 3.3.4
+2024.11.12 14:03:42 INFO  Attempting to connect to the build server...
+2024.11.12 14:03:42 INFO  No running Bloop server found, starting one.
+2024.11.12 14:03:43 INFO  Starting compilation server
+2024.11.12 14:03:44 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/.metals/bsp.trace.json or /home/rahul/.cache/metals/bsp.trace.json
+2024.11.12 14:03:45 INFO  Attempting to connect to the build server...
+2024.11.12 14:03:45 INFO  Found a Bloop server running
+2024.11.12 14:03:45 INFO  tracing is disabled for protocol BSP, to enable tracing of incoming and outgoing JSON messages create an empty file at /home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/project/.metals/bsp.trace.json or /home/rahul/.cache/metals/bsp.trace.json
+2024.11.12 14:03:44 INFO  time: Connected to build server in 2.92s
+2024.11.12 14:03:44 INFO  Connected to Build server: Bloop v2.0.3
+2024.11.12 14:03:45 INFO  time: Imported build in 0.14s
+2024.11.12 14:04:47 INFO  running doctor check
+2024.11.12 14:04:47 INFO  java targets: chisel_snn_rahul-test, chisel_snn_rahul-build, chisel_snn_rahul
+2024.11.12 14:04:49 WARN  Flyway upgrade recommended: H2 2.3.232 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.224.
+2024.11.12 14:04:49 INFO  time: indexed workspace in 2.65s
+2024.11.12 14:12:04 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 14:12:04 INFO  time: compiled chisel_snn_rahul in 0.99s
+2024.11.12 14:13:31 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 14:13:34 INFO  time: compiled chisel_snn_rahul in 3.17s
+2024.11.12 14:13:39 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 14:13:40 INFO  time: compiled chisel_snn_rahul in 1.76s
+2024.11.12 14:47:48 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 14:47:48 INFO  time: compiled chisel_snn_rahul in 0.46s
+2024.11.12 14:48:06 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 14:48:07 INFO  time: compiled chisel_snn_rahul in 1.52s
+2024.11.12 15:09:20 INFO  compiling chisel_snn_rahul (1 scala source)
+2024.11.12 15:09:22 INFO  time: compiled chisel_snn_rahul in 1.33s

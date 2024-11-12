@@ -759,407 +759,260 @@ module mempot(	// src/main/scala/mempot.scala:43:7
   );
 endmodule
 
-module conv(	// src/main/scala/conv.scala:15:7
-  input        clock,	// src/main/scala/conv.scala:15:7
-               reset,	// src/main/scala/conv.scala:15:7
-               io_wr_enable_aeq_0,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_1,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_2,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_3,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_4,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_5,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_6,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_7,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_aeq_8,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_aeq,	// src/main/scala/conv.scala:16:14
-  input  [8:0] io_writeData_aeq_0,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_1,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_2,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_3,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_4,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_5,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_6,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_7,	// src/main/scala/conv.scala:16:14
-               io_writeData_aeq_8,	// src/main/scala/conv.scala:16:14
-  output [8:0] io_readData_aeq_0,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_1,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_2,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_3,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_4,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_5,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_6,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_7,	// src/main/scala/conv.scala:16:14
-               io_readData_aeq_8,	// src/main/scala/conv.scala:16:14
-  input        io_wr_enable_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_wr_enable_mempot_8,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_rd_enable_mempot_8,	// src/main/scala/conv.scala:16:14
-  input  [7:0] io_addr_r_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_addr_r_mempot_8,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_addr_w_mempot_8,	// src/main/scala/conv.scala:16:14
-  input  [8:0] io_din_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_din_mempot_8,	// src/main/scala/conv.scala:16:14
-  output [8:0] io_dout_mempot_0,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_1,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_2,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_3,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_4,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_5,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_6,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_7,	// src/main/scala/conv.scala:16:14
-               io_dout_mempot_8,	// src/main/scala/conv.scala:16:14
-  input  [7:0] io_bias_0,	// src/main/scala/conv.scala:16:14
-               io_bias_1,	// src/main/scala/conv.scala:16:14
-               io_bias_2,	// src/main/scala/conv.scala:16:14
-               io_bias_3,	// src/main/scala/conv.scala:16:14
-               io_bias_4,	// src/main/scala/conv.scala:16:14
-               io_bias_5,	// src/main/scala/conv.scala:16:14
-               io_bias_6,	// src/main/scala/conv.scala:16:14
-               io_bias_7,	// src/main/scala/conv.scala:16:14
-               io_bias_8,	// src/main/scala/conv.scala:16:14
-               io_V_t,	// src/main/scala/conv.scala:16:14
-  input        io_thresh_enab,	// src/main/scala/conv.scala:16:14
-               io_conv_enab,	// src/main/scala/conv.scala:16:14
-  input  [7:0] io_kernel_0,	// src/main/scala/conv.scala:16:14
-               io_kernel_1,	// src/main/scala/conv.scala:16:14
-               io_kernel_2,	// src/main/scala/conv.scala:16:14
-               io_kernel_3,	// src/main/scala/conv.scala:16:14
-               io_kernel_4,	// src/main/scala/conv.scala:16:14
-               io_kernel_5,	// src/main/scala/conv.scala:16:14
-               io_kernel_6,	// src/main/scala/conv.scala:16:14
-               io_kernel_7,	// src/main/scala/conv.scala:16:14
-               io_kernel_8	// src/main/scala/conv.scala:16:14
+module pe(	// src/main/scala/pe.scala:15:7
+  input        clock,	// src/main/scala/pe.scala:15:7
+               reset,	// src/main/scala/pe.scala:15:7
+               io_wr_enable_aeq_0,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_1,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_2,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_3,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_4,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_5,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_6,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_7,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_aeq_8,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_aeq,	// src/main/scala/pe.scala:16:14
+  input  [8:0] io_writeData_aeq_0,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_1,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_2,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_3,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_4,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_5,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_6,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_7,	// src/main/scala/pe.scala:16:14
+               io_writeData_aeq_8,	// src/main/scala/pe.scala:16:14
+  output [8:0] io_readData_aeq_0,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_1,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_2,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_3,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_4,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_5,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_6,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_7,	// src/main/scala/pe.scala:16:14
+               io_readData_aeq_8,	// src/main/scala/pe.scala:16:14
+  input        io_wr_enable_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_wr_enable_mempot_8,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_rd_enable_mempot_8,	// src/main/scala/pe.scala:16:14
+  input  [7:0] io_addr_r_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_addr_r_mempot_8,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_addr_w_mempot_8,	// src/main/scala/pe.scala:16:14
+  input  [8:0] io_din_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_din_mempot_8,	// src/main/scala/pe.scala:16:14
+  output [8:0] io_dout_mempot_0,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_1,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_2,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_3,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_4,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_5,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_6,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_7,	// src/main/scala/pe.scala:16:14
+               io_dout_mempot_8,	// src/main/scala/pe.scala:16:14
+  input  [7:0] io_bias_0,	// src/main/scala/pe.scala:16:14
+               io_bias_1,	// src/main/scala/pe.scala:16:14
+               io_bias_2,	// src/main/scala/pe.scala:16:14
+               io_bias_3,	// src/main/scala/pe.scala:16:14
+               io_bias_4,	// src/main/scala/pe.scala:16:14
+               io_bias_5,	// src/main/scala/pe.scala:16:14
+               io_bias_6,	// src/main/scala/pe.scala:16:14
+               io_bias_7,	// src/main/scala/pe.scala:16:14
+               io_bias_8,	// src/main/scala/pe.scala:16:14
+               io_V_t,	// src/main/scala/pe.scala:16:14
+  input        io_thresh_enab,	// src/main/scala/pe.scala:16:14
+               io_conv_enab,	// src/main/scala/pe.scala:16:14
+  input  [7:0] io_kernel_0,	// src/main/scala/pe.scala:16:14
+               io_kernel_1,	// src/main/scala/pe.scala:16:14
+               io_kernel_2,	// src/main/scala/pe.scala:16:14
+               io_kernel_3,	// src/main/scala/pe.scala:16:14
+               io_kernel_4,	// src/main/scala/pe.scala:16:14
+               io_kernel_5,	// src/main/scala/pe.scala:16:14
+               io_kernel_6,	// src/main/scala/pe.scala:16:14
+               io_kernel_7,	// src/main/scala/pe.scala:16:14
+               io_kernel_8	// src/main/scala/pe.scala:16:14
 );
 
-  wire [8:0]       _mempotMem_io_dout_0;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_1;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_2;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_3;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_4;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_5;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_6;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_7;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _mempotMem_io_dout_8;	// src/main/scala/conv.scala:40:25
-  wire [8:0]       _aeqMem_io_readData_0;	// src/main/scala/conv.scala:39:22
-  wire             _GEN = io_thresh_enab & ~io_conv_enab;	// src/main/scala/conv.scala:63:{48,51}
-  reg  [7:0]       counter;	// src/main/scala/chisel3/util/Counter.scala:61:40
-  wire             wrap = _GEN & (&counter);	// src/main/scala/chisel3/util/Counter.scala:61:40, :73:24, :117:24, :118:{16,23}, src/main/scala/conv.scala:63:48
-  wire [7:0]       _dout_0_T = _mempotMem_io_dout_0[7:0] + io_bias_0;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_0 = ~wrap | io_wr_enable_mempot_0;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_1 =
-    wrap ? io_din_mempot_0 : _dout_0_T > io_V_t ? 9'h100 : {1'h0, _dout_0_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_1_T = _mempotMem_io_dout_1[7:0] + io_bias_1;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_2 = ~wrap | io_wr_enable_mempot_1;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_3 =
-    wrap ? io_din_mempot_1 : _dout_1_T > io_V_t ? 9'h100 : {1'h0, _dout_1_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_2_T = _mempotMem_io_dout_2[7:0] + io_bias_2;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_4 = ~wrap | io_wr_enable_mempot_2;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_5 =
-    wrap ? io_din_mempot_2 : _dout_2_T > io_V_t ? 9'h100 : {1'h0, _dout_2_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_3_T = _mempotMem_io_dout_3[7:0] + io_bias_3;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_6 = ~wrap | io_wr_enable_mempot_3;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_7 =
-    wrap ? io_din_mempot_3 : _dout_3_T > io_V_t ? 9'h100 : {1'h0, _dout_3_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_4_T = _mempotMem_io_dout_4[7:0] + io_bias_4;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_8 = ~wrap | io_wr_enable_mempot_4;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_9 =
-    wrap ? io_din_mempot_4 : _dout_4_T > io_V_t ? 9'h100 : {1'h0, _dout_4_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_5_T = _mempotMem_io_dout_5[7:0] + io_bias_5;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_10 = ~wrap | io_wr_enable_mempot_5;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_11 =
-    wrap ? io_din_mempot_5 : _dout_5_T > io_V_t ? 9'h100 : {1'h0, _dout_5_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_6_T = _mempotMem_io_dout_6[7:0] + io_bias_6;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_12 = ~wrap | io_wr_enable_mempot_6;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_13 =
-    wrap ? io_din_mempot_6 : _dout_6_T > io_V_t ? 9'h100 : {1'h0, _dout_6_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_7_T = _mempotMem_io_dout_7[7:0] + io_bias_7;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_14 = ~wrap | io_wr_enable_mempot_7;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_15 =
-    wrap ? io_din_mempot_7 : _dout_7_T > io_V_t ? 9'h100 : {1'h0, _dout_7_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  wire [7:0]       _dout_8_T = _mempotMem_io_dout_8[7:0] + io_bias_8;	// src/main/scala/conv.scala:40:25, :72:25
-  wire             _GEN_16 = ~wrap | io_wr_enable_mempot_8;	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:47:26, :65:14, :74:30
-  wire [8:0]       _GEN_17 =
-    wrap ? io_din_mempot_8 : _dout_8_T > io_V_t ? 9'h100 : {1'h0, _dout_8_T};	// src/main/scala/chisel3/util/Counter.scala:117:24, :118:{16,23}, src/main/scala/conv.scala:15:7, :51:20, :65:14, :72:25, :74:{20,30}, :76:29, :79:29
-  reg              conv_done;	// src/main/scala/conv.scala:85:26
-  wire             _GEN_18 = ~conv_done & io_conv_enab & ~io_thresh_enab;	// src/main/scala/conv.scala:85:26, :87:{8,35,38}
-  wire [9:0]       m = {2'h0, _aeqMem_io_readData_0[8:1] / 8'h10} * 10'h3;	// src/main/scala/conv.scala:39:22, :72:25, :92:31, :93:{22,34}
-  wire [7:0]       _n_T = _aeqMem_io_readData_0[8:1] % 8'h10;	// src/main/scala/conv.scala:39:22, :92:31, :93:34, :94:34
-  wire [9:0]       _mk_T_24 = m - 10'h1;	// src/main/scala/conv.scala:93:22, :98:24
-  wire [6:0]       _nl_T_24 = {2'h0, _n_T[4:0]} * 7'h3 - 7'h1;	// src/main/scala/conv.scala:72:25, :94:{22,34}, :99:24
-  wire [9:0]       _c_T = _mk_T_24 % 10'h3;	// src/main/scala/conv.scala:93:22, :98:24, :101:25
-  wire [7:0]       _c_T_1 = {1'h0, _nl_T_24} % 8'h3;	// src/main/scala/conv.scala:15:7, :99:{24,30}, :101:44
-  wire [3:0]       _c_T_3 = {2'h0, _c_T[1:0]} + {2'h0, _c_T_1[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [15:0][8:0] _GEN_19 =
-    {{_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_0},
-     {_mempotMem_io_dout_8},
-     {_mempotMem_io_dout_7},
-     {_mempotMem_io_dout_6},
-     {_mempotMem_io_dout_5},
-     {_mempotMem_io_dout_4},
-     {_mempotMem_io_dout_3},
-     {_mempotMem_io_dout_2},
-     {_mempotMem_io_dout_1},
-     {_mempotMem_io_dout_0}};	// src/main/scala/conv.scala:40:25, :104:43
-  wire [8:0]       _kernel_added_T = _GEN_19[_c_T_3] + {1'h0, io_kernel_8};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire [15:0]      _GEN_20 =
-    {{io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_0},
-     {io_wr_enable_mempot_8},
-     {io_wr_enable_mempot_7},
-     {io_wr_enable_mempot_6},
-     {io_wr_enable_mempot_5},
-     {io_wr_enable_mempot_4},
-     {io_wr_enable_mempot_3},
-     {io_wr_enable_mempot_2},
-     {io_wr_enable_mempot_1},
-     {io_wr_enable_mempot_0}};	// src/main/scala/conv.scala:106:42
-  wire             _GEN_21 = _GEN_20[_c_T_3] & _c_T_3 == 4'h0;	// src/main/scala/conv.scala:65:14, :101:32, :104:43, :106:42, :107:41
-  wire             _GEN_22 = _GEN_20[_c_T_3] & _c_T_3 == 4'h1;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_23 = _GEN_20[_c_T_3] & _c_T_3 == 4'h2;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_24 = _GEN_20[_c_T_3] & _c_T_3 == 4'h3;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_25 = _GEN_20[_c_T_3] & _c_T_3 == 4'h4;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_26 = _GEN_20[_c_T_3] & _c_T_3 == 4'h5;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_27 = _GEN_20[_c_T_3] & _c_T_3 == 4'h6;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_28 = _GEN_20[_c_T_3] & _c_T_3 == 4'h7;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire             _GEN_29 = _GEN_20[_c_T_3] & _c_T_3 == 4'h8;	// src/main/scala/conv.scala:65:14, :101:32, :106:42, :107:41
-  wire [7:0]       _GEN_30 = {1'h0, _nl_T_24};	// src/main/scala/conv.scala:15:7, :99:{24,30}
-  wire [9:0]       _c_T_4 = _mk_T_24 % 10'h3;	// src/main/scala/conv.scala:93:22, :98:24, :101:25
-  wire [7:0]       _c_T_5 = (_GEN_30 + 8'h1) % 8'h3;	// src/main/scala/conv.scala:99:{24,30}, :101:44
-  wire [3:0]       _c_T_7 = {2'h0, _c_T_4[1:0]} + {2'h0, _c_T_5[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_1 = _GEN_19[_c_T_7] + {1'h0, io_kernel_7};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_31 = _c_T_7 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :107:41
-  wire             _GEN_32 =
-    _GEN_20[_c_T_7] ? _GEN_31 | _GEN_21 | _GEN_0 : _GEN_21 | _GEN_0;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_33 = _c_T_7 == 4'h1;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_34 =
-    _GEN_20[_c_T_7] ? _GEN_33 | _GEN_22 | _GEN_2 : _GEN_22 | _GEN_2;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_35 = _c_T_7 == 4'h2;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_36 =
-    _GEN_20[_c_T_7] ? _GEN_35 | _GEN_23 | _GEN_4 : _GEN_23 | _GEN_4;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_37 = _c_T_7 == 4'h3;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_38 =
-    _GEN_20[_c_T_7] ? _GEN_37 | _GEN_24 | _GEN_6 : _GEN_24 | _GEN_6;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_39 = _c_T_7 == 4'h4;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_40 =
-    _GEN_20[_c_T_7] ? _GEN_39 | _GEN_25 | _GEN_8 : _GEN_25 | _GEN_8;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_41 = _c_T_7 == 4'h5;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_42 =
-    _GEN_20[_c_T_7] ? _GEN_41 | _GEN_26 | _GEN_10 : _GEN_26 | _GEN_10;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_43 = _c_T_7 == 4'h6;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_44 =
-    _GEN_20[_c_T_7] ? _GEN_43 | _GEN_27 | _GEN_12 : _GEN_27 | _GEN_12;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_45 = _c_T_7 == 4'h7;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_46 =
-    _GEN_20[_c_T_7] ? _GEN_45 | _GEN_28 | _GEN_14 : _GEN_28 | _GEN_14;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire             _GEN_47 = _c_T_7 == 4'h8;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_48 =
-    _GEN_20[_c_T_7] ? _GEN_47 | _GEN_29 | _GEN_16 : _GEN_29 | _GEN_16;	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :101:32, :106:42, :107:41
-  wire [9:0]       _c_T_8 = _mk_T_24 % 10'h3;	// src/main/scala/conv.scala:93:22, :98:24, :101:25
-  wire [7:0]       _c_T_9 = (_GEN_30 + 8'h2) % 8'h3;	// src/main/scala/conv.scala:99:30, :101:44
-  wire [3:0]       _c_T_11 = {2'h0, _c_T_8[1:0]} + {2'h0, _c_T_9[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_2 = _GEN_19[_c_T_11] + {1'h0, io_kernel_6};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_49 = _GEN_20[_c_T_11] & _c_T_11 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :106:42, :107:41
-  wire             _GEN_50 = _GEN_20[_c_T_11] & _c_T_11 == 4'h1;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_51 = _GEN_20[_c_T_11] & _c_T_11 == 4'h2;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_52 = _GEN_20[_c_T_11] & _c_T_11 == 4'h3;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_53 = _GEN_20[_c_T_11] & _c_T_11 == 4'h4;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_54 = _GEN_20[_c_T_11] & _c_T_11 == 4'h5;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_55 = _GEN_20[_c_T_11] & _c_T_11 == 4'h6;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_56 = _GEN_20[_c_T_11] & _c_T_11 == 4'h7;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_57 = _GEN_20[_c_T_11] & _c_T_11 == 4'h8;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire [9:0]       _c_T_12 = m % 10'h3;	// src/main/scala/conv.scala:93:22, :101:25
-  wire [7:0]       _c_T_13 = {1'h0, _nl_T_24} % 8'h3;	// src/main/scala/conv.scala:15:7, :99:{24,30}, :101:44
-  wire [3:0]       _c_T_15 = {2'h0, _c_T_12[1:0]} + {2'h0, _c_T_13[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_3 = _GEN_19[_c_T_15] + {1'h0, io_kernel_5};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_58 = _c_T_15 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :107:41
-  wire             _GEN_59 =
-    _GEN_20[_c_T_15] ? _GEN_58 | _GEN_49 | _GEN_32 : _GEN_49 | _GEN_32;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_60 = _c_T_15 == 4'h1;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_61 =
-    _GEN_20[_c_T_15] ? _GEN_60 | _GEN_50 | _GEN_34 : _GEN_50 | _GEN_34;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_62 = _c_T_15 == 4'h2;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_63 =
-    _GEN_20[_c_T_15] ? _GEN_62 | _GEN_51 | _GEN_36 : _GEN_51 | _GEN_36;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_64 = _c_T_15 == 4'h3;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_65 =
-    _GEN_20[_c_T_15] ? _GEN_64 | _GEN_52 | _GEN_38 : _GEN_52 | _GEN_38;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_66 = _c_T_15 == 4'h4;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_67 =
-    _GEN_20[_c_T_15] ? _GEN_66 | _GEN_53 | _GEN_40 : _GEN_53 | _GEN_40;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_68 = _c_T_15 == 4'h5;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_69 =
-    _GEN_20[_c_T_15] ? _GEN_68 | _GEN_54 | _GEN_42 : _GEN_54 | _GEN_42;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_70 = _c_T_15 == 4'h6;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_71 =
-    _GEN_20[_c_T_15] ? _GEN_70 | _GEN_55 | _GEN_44 : _GEN_55 | _GEN_44;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_72 = _c_T_15 == 4'h7;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_73 =
-    _GEN_20[_c_T_15] ? _GEN_72 | _GEN_56 | _GEN_46 : _GEN_56 | _GEN_46;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_74 = _c_T_15 == 4'h8;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_75 =
-    _GEN_20[_c_T_15] ? _GEN_74 | _GEN_57 | _GEN_48 : _GEN_57 | _GEN_48;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire [9:0]       _c_T_16 = m % 10'h3;	// src/main/scala/conv.scala:93:22, :101:25
-  wire [7:0]       _c_T_17 = (_GEN_30 + 8'h1) % 8'h3;	// src/main/scala/conv.scala:99:{24,30}, :101:44
-  wire [3:0]       _c_T_19 = {2'h0, _c_T_16[1:0]} + {2'h0, _c_T_17[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_4 = _GEN_19[_c_T_19] + {1'h0, io_kernel_4};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_76 = _GEN_20[_c_T_19] & _c_T_19 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :106:42, :107:41
-  wire             _GEN_77 = _GEN_20[_c_T_19] & _c_T_19 == 4'h1;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_78 = _GEN_20[_c_T_19] & _c_T_19 == 4'h2;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_79 = _GEN_20[_c_T_19] & _c_T_19 == 4'h3;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_80 = _GEN_20[_c_T_19] & _c_T_19 == 4'h4;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_81 = _GEN_20[_c_T_19] & _c_T_19 == 4'h5;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_82 = _GEN_20[_c_T_19] & _c_T_19 == 4'h6;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_83 = _GEN_20[_c_T_19] & _c_T_19 == 4'h7;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_84 = _GEN_20[_c_T_19] & _c_T_19 == 4'h8;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire [9:0]       _c_T_20 = m % 10'h3;	// src/main/scala/conv.scala:93:22, :101:25
-  wire [7:0]       _c_T_21 = (_GEN_30 + 8'h2) % 8'h3;	// src/main/scala/conv.scala:99:30, :101:44
-  wire [3:0]       _c_T_23 = {2'h0, _c_T_20[1:0]} + {2'h0, _c_T_21[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_5 = _GEN_19[_c_T_23] + {1'h0, io_kernel_3};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_85 = _c_T_23 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :107:41
-  wire             _GEN_86 =
-    _GEN_20[_c_T_23] ? _GEN_85 | _GEN_76 | _GEN_59 : _GEN_76 | _GEN_59;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_87 = _c_T_23 == 4'h1;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_88 =
-    _GEN_20[_c_T_23] ? _GEN_87 | _GEN_77 | _GEN_61 : _GEN_77 | _GEN_61;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_89 = _c_T_23 == 4'h2;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_90 =
-    _GEN_20[_c_T_23] ? _GEN_89 | _GEN_78 | _GEN_63 : _GEN_78 | _GEN_63;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_91 = _c_T_23 == 4'h3;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_92 =
-    _GEN_20[_c_T_23] ? _GEN_91 | _GEN_79 | _GEN_65 : _GEN_79 | _GEN_65;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_93 = _c_T_23 == 4'h4;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_94 =
-    _GEN_20[_c_T_23] ? _GEN_93 | _GEN_80 | _GEN_67 : _GEN_80 | _GEN_67;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_95 = _c_T_23 == 4'h5;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_96 =
-    _GEN_20[_c_T_23] ? _GEN_95 | _GEN_81 | _GEN_69 : _GEN_81 | _GEN_69;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_97 = _c_T_23 == 4'h6;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_98 =
-    _GEN_20[_c_T_23] ? _GEN_97 | _GEN_82 | _GEN_71 : _GEN_82 | _GEN_71;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_99 = _c_T_23 == 4'h7;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_100 =
-    _GEN_20[_c_T_23] ? _GEN_99 | _GEN_83 | _GEN_73 : _GEN_83 | _GEN_73;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_101 = _c_T_23 == 4'h8;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_102 =
-    _GEN_20[_c_T_23] ? _GEN_101 | _GEN_84 | _GEN_75 : _GEN_84 | _GEN_75;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire [9:0]       _c_T_24 = (m + 10'h1) % 10'h3;	// src/main/scala/conv.scala:93:22, :98:30, :101:25
-  wire [7:0]       _c_T_25 = {1'h0, _nl_T_24} % 8'h3;	// src/main/scala/conv.scala:15:7, :99:{24,30}, :101:44
-  wire [3:0]       _c_T_27 = {2'h0, _c_T_24[1:0]} + {2'h0, _c_T_25[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_6 = _GEN_19[_c_T_27] + {1'h0, io_kernel_2};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_103 = _GEN_20[_c_T_27] & _c_T_27 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :106:42, :107:41
-  wire             _GEN_104 = _GEN_20[_c_T_27] & _c_T_27 == 4'h1;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_105 = _GEN_20[_c_T_27] & _c_T_27 == 4'h2;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_106 = _GEN_20[_c_T_27] & _c_T_27 == 4'h3;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_107 = _GEN_20[_c_T_27] & _c_T_27 == 4'h4;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_108 = _GEN_20[_c_T_27] & _c_T_27 == 4'h5;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_109 = _GEN_20[_c_T_27] & _c_T_27 == 4'h6;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_110 = _GEN_20[_c_T_27] & _c_T_27 == 4'h7;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_111 = _GEN_20[_c_T_27] & _c_T_27 == 4'h8;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire [9:0]       _c_T_28 = (m + 10'h1) % 10'h3;	// src/main/scala/conv.scala:93:22, :98:30, :101:25
-  wire [7:0]       _c_T_29 = (_GEN_30 + 8'h1) % 8'h3;	// src/main/scala/conv.scala:99:{24,30}, :101:44
-  wire [3:0]       _c_T_31 = {2'h0, _c_T_28[1:0]} + {2'h0, _c_T_29[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_7 = _GEN_19[_c_T_31] + {1'h0, io_kernel_1};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_112 = _c_T_31 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :107:41
-  wire             _GEN_113 = _c_T_31 == 4'h1;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_114 = _c_T_31 == 4'h2;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_115 = _c_T_31 == 4'h3;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_116 = _c_T_31 == 4'h4;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_117 = _c_T_31 == 4'h5;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_118 = _c_T_31 == 4'h6;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_119 = _c_T_31 == 4'h7;	// src/main/scala/conv.scala:101:32, :107:41
-  wire             _GEN_120 = _c_T_31 == 4'h8;	// src/main/scala/conv.scala:101:32, :107:41
-  wire [9:0]       _c_T_32 = (m + 10'h1) % 10'h3;	// src/main/scala/conv.scala:93:22, :98:30, :101:25
-  wire [7:0]       _c_T_33 = (_GEN_30 + 8'h2) % 8'h3;	// src/main/scala/conv.scala:99:30, :101:44
-  wire [3:0]       _c_T_35 = {2'h0, _c_T_32[1:0]} + {2'h0, _c_T_33[1:0]} * 4'h3;	// src/main/scala/conv.scala:72:25, :101:{25,32,38,44}, :107:41
-  wire [8:0]       _kernel_added_T_8 = _GEN_19[_c_T_35] + {1'h0, io_kernel_0};	// src/main/scala/conv.scala:15:7, :101:32, :104:43
-  wire             _GEN_121 = _GEN_20[_c_T_35] & _c_T_35 == 4'h0;	// src/main/scala/conv.scala:101:32, :104:43, :106:42, :107:41
-  wire             _GEN_122 = _GEN_18 & io_rd_enable_aeq & _aeqMem_io_readData_0[0];	// src/main/scala/conv.scala:39:22, :65:14, :87:{35,55}, :88:28, :91:{19,24}, :106:42
-  wire             _GEN_123 = _GEN_20[_c_T_35] & _c_T_35 == 4'h1;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_124 = _GEN_20[_c_T_35] & _c_T_35 == 4'h2;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_125 = _GEN_20[_c_T_35] & _c_T_35 == 4'h3;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_126 = _GEN_20[_c_T_35] & _c_T_35 == 4'h4;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_127 = _GEN_20[_c_T_35] & _c_T_35 == 4'h5;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_128 = _GEN_20[_c_T_35] & _c_T_35 == 4'h6;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_129 = _GEN_20[_c_T_35] & _c_T_35 == 4'h7;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  wire             _GEN_130 = _GEN_20[_c_T_35] & _c_T_35 == 4'h8;	// src/main/scala/conv.scala:101:32, :106:42, :107:41
-  always @(posedge clock) begin	// src/main/scala/conv.scala:15:7
-    if (reset) begin	// src/main/scala/conv.scala:15:7
-      counter <= 8'h0;	// src/main/scala/chisel3/util/Counter.scala:61:40
-      conv_done <= 1'h0;	// src/main/scala/conv.scala:15:7, :85:26
+  wire [8:0] _mempotMem_io_dout_0;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_1;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_2;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_3;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_4;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_5;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_6;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_7;	// src/main/scala/pe.scala:37:25
+  wire [8:0] _mempotMem_io_dout_8;	// src/main/scala/pe.scala:37:25
+  reg  [8:0] s2_memRead_0;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_1;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_2;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_3;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_4;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_5;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_6;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_7;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s2_memRead_8;	// src/main/scala/pe.scala:53:23
+  reg  [8:0] s3_updates_0;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_1;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_2;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_3;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_4;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_5;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_6;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_7;	// src/main/scala/pe.scala:54:23
+  reg  [8:0] s3_updates_8;	// src/main/scala/pe.scala:54:23
+  reg        validS1;	// src/main/scala/pe.scala:56:24
+  reg        validS2;	// src/main/scala/pe.scala:57:24
+  reg        validS3;	// src/main/scala/pe.scala:58:24
+  reg        validS4;	// src/main/scala/pe.scala:59:24
+  always @(posedge clock) begin	// src/main/scala/pe.scala:15:7
+    automatic logic _GEN;	// src/main/scala/pe.scala:66:18
+    automatic logic _GEN_0;	// src/main/scala/pe.scala:88:18
+    automatic logic _GEN_1;	// src/main/scala/pe.scala:96:18
+    _GEN = validS2 & validS3;	// src/main/scala/pe.scala:57:24, :58:24, :66:18
+    _GEN_0 = validS1 & ~_GEN;	// src/main/scala/pe.scala:56:24, :66:18, :72:30, :88:18
+    _GEN_1 = validS2 & ~_GEN;	// src/main/scala/pe.scala:57:24, :66:18, :72:30, :96:18
+    if (validS2 & validS4) begin	// src/main/scala/pe.scala:57:24, :59:24, :115:16
+      s2_memRead_0 <= s3_updates_0;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_1 <= s3_updates_1;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_2 <= s3_updates_2;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_3 <= s3_updates_3;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_4 <= s3_updates_4;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_5 <= s3_updates_5;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_6 <= s3_updates_6;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_7 <= s3_updates_7;	// src/main/scala/pe.scala:53:23, :54:23
+      s2_memRead_8 <= s3_updates_8;	// src/main/scala/pe.scala:53:23, :54:23
     end
-    else begin	// src/main/scala/conv.scala:15:7
-      if (_GEN)	// src/main/scala/conv.scala:63:48
-        counter <= counter + 8'h1;	// src/main/scala/chisel3/util/Counter.scala:61:40, :77:24, src/main/scala/conv.scala:99:24
-      conv_done <= _GEN_18 & io_rd_enable_aeq | conv_done;	// src/main/scala/conv.scala:85:26, :87:{35,55}, :88:28, :114:17
+    else if (_GEN_0) begin	// src/main/scala/pe.scala:88:18
+      s2_memRead_0 <= _mempotMem_io_dout_0;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_1 <= _mempotMem_io_dout_1;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_2 <= _mempotMem_io_dout_2;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_3 <= _mempotMem_io_dout_3;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_4 <= _mempotMem_io_dout_4;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_5 <= _mempotMem_io_dout_5;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_6 <= _mempotMem_io_dout_6;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_7 <= _mempotMem_io_dout_7;	// src/main/scala/pe.scala:37:25, :53:23
+      s2_memRead_8 <= _mempotMem_io_dout_8;	// src/main/scala/pe.scala:37:25, :53:23
+    end
+    if (_GEN_1) begin	// src/main/scala/pe.scala:96:18
+      automatic logic [8:0] _update_T;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_1;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_2;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_3;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_4;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_5;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_6;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_7;	// src/main/scala/pe.scala:98:36
+      automatic logic [8:0] _update_T_8;	// src/main/scala/pe.scala:98:36
+      _update_T = s2_memRead_0 + {1'h0, io_kernel_0};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_1 = s2_memRead_1 + {1'h0, io_kernel_1};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_2 = s2_memRead_2 + {1'h0, io_kernel_2};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_3 = s2_memRead_3 + {1'h0, io_kernel_3};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_4 = s2_memRead_4 + {1'h0, io_kernel_4};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_5 = s2_memRead_5 + {1'h0, io_kernel_5};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_6 = s2_memRead_6 + {1'h0, io_kernel_6};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_7 = s2_memRead_7 + {1'h0, io_kernel_7};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      _update_T_8 = s2_memRead_8 + {1'h0, io_kernel_8};	// src/main/scala/pe.scala:53:23, :56:24, :98:36
+      s3_updates_0 <= _update_T[8] ? 9'hFF : _update_T;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_1 <= _update_T_1[8] ? 9'hFF : _update_T_1;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_2 <= _update_T_2[8] ? 9'hFF : _update_T_2;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_3 <= _update_T_3[8] ? 9'hFF : _update_T_3;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_4 <= _update_T_4[8] ? 9'hFF : _update_T_4;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_5 <= _update_T_5[8] ? 9'hFF : _update_T_5;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_6 <= _update_T_6[8] ? 9'hFF : _update_T_6;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_7 <= _update_T_7[8] ? 9'hFF : _update_T_7;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+      s3_updates_8 <= _update_T_8[8] ? 9'hFF : _update_T_8;	// src/main/scala/pe.scala:54:23, :98:36, :100:{29,37}
+    end
+    if (reset) begin	// src/main/scala/pe.scala:15:7
+      validS1 <= 1'h0;	// src/main/scala/pe.scala:56:24
+      validS2 <= 1'h0;	// src/main/scala/pe.scala:56:24, :57:24
+      validS3 <= 1'h0;	// src/main/scala/pe.scala:56:24, :58:24
+      validS4 <= 1'h0;	// src/main/scala/pe.scala:56:24, :59:24
+    end
+    else begin	// src/main/scala/pe.scala:15:7
+      automatic logic _GEN_2;	// src/main/scala/pe.scala:122:16
+      _GEN_2 = validS4 & ~_GEN;	// src/main/scala/pe.scala:59:24, :66:18, :72:30, :122:16
+      validS1 <= ~_GEN_2 & (io_rd_enable_aeq & ~_GEN | validS1);	// src/main/scala/pe.scala:56:24, :66:18, :72:{27,30,46}, :84:17, :122:{16,35}, :123:13
+      validS2 <= ~_GEN_2 & (_GEN_0 | validS2);	// src/main/scala/pe.scala:57:24, :72:46, :88:{18,37}, :92:17, :122:{16,35}, :123:13, :124:13
+      validS3 <= ~_GEN_2 & (_GEN_1 | validS3);	// src/main/scala/pe.scala:58:24, :72:46, :96:{18,37}, :102:17, :122:{16,35}, :123:13, :125:13
+      validS4 <= ~_GEN_2 & (validS3 | validS4);	// src/main/scala/pe.scala:58:24, :59:24, :72:46, :106:17, :111:13, :122:{16,35}, :123:13, :126:13
     end
   end // always @(posedge)
-  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/conv.scala:15:7
-    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/conv.scala:15:7
-      `FIRRTL_BEFORE_INITIAL	// src/main/scala/conv.scala:15:7
+  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/pe.scala:15:7
+    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/pe.scala:15:7
+      `FIRRTL_BEFORE_INITIAL	// src/main/scala/pe.scala:15:7
     `endif // FIRRTL_BEFORE_INITIAL
-    initial begin	// src/main/scala/conv.scala:15:7
-      automatic logic [31:0] _RANDOM[0:0];	// src/main/scala/conv.scala:15:7
-      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/conv.scala:15:7
-        `INIT_RANDOM_PROLOG_	// src/main/scala/conv.scala:15:7
+    initial begin	// src/main/scala/pe.scala:15:7
+      automatic logic [31:0] _RANDOM[0:7];	// src/main/scala/pe.scala:15:7
+      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/pe.scala:15:7
+        `INIT_RANDOM_PROLOG_	// src/main/scala/pe.scala:15:7
       `endif // INIT_RANDOM_PROLOG_
-      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/conv.scala:15:7
-        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// src/main/scala/conv.scala:15:7
-        counter = _RANDOM[/*Zero width*/ 1'b0][8:1];	// src/main/scala/chisel3/util/Counter.scala:61:40, src/main/scala/conv.scala:15:7
-        conv_done = _RANDOM[/*Zero width*/ 1'b0][9];	// src/main/scala/chisel3/util/Counter.scala:61:40, src/main/scala/conv.scala:15:7, :85:26
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/pe.scala:15:7
+        for (logic [3:0] i = 4'h0; i < 4'h8; i += 4'h1) begin
+          _RANDOM[i[2:0]] = `RANDOM;	// src/main/scala/pe.scala:15:7
+        end	// src/main/scala/pe.scala:15:7
+        s2_memRead_0 = _RANDOM[3'h2][16:8];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_1 = _RANDOM[3'h2][25:17];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_2 = {_RANDOM[3'h2][31:26], _RANDOM[3'h3][2:0]};	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_3 = _RANDOM[3'h3][11:3];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_4 = _RANDOM[3'h3][20:12];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_5 = _RANDOM[3'h3][29:21];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_6 = {_RANDOM[3'h3][31:30], _RANDOM[3'h4][6:0]};	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_7 = _RANDOM[3'h4][15:7];	// src/main/scala/pe.scala:15:7, :53:23
+        s2_memRead_8 = _RANDOM[3'h4][24:16];	// src/main/scala/pe.scala:15:7, :53:23
+        s3_updates_0 = {_RANDOM[3'h4][31:25], _RANDOM[3'h5][1:0]};	// src/main/scala/pe.scala:15:7, :53:23, :54:23
+        s3_updates_1 = _RANDOM[3'h5][10:2];	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_2 = _RANDOM[3'h5][19:11];	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_3 = _RANDOM[3'h5][28:20];	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_4 = {_RANDOM[3'h5][31:29], _RANDOM[3'h6][5:0]};	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_5 = _RANDOM[3'h6][14:6];	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_6 = _RANDOM[3'h6][23:15];	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_7 = {_RANDOM[3'h6][31:24], _RANDOM[3'h7][0]};	// src/main/scala/pe.scala:15:7, :54:23
+        s3_updates_8 = _RANDOM[3'h7][9:1];	// src/main/scala/pe.scala:15:7, :54:23
+        validS1 = _RANDOM[3'h7][10];	// src/main/scala/pe.scala:15:7, :54:23, :56:24
+        validS2 = _RANDOM[3'h7][11];	// src/main/scala/pe.scala:15:7, :54:23, :57:24
+        validS3 = _RANDOM[3'h7][12];	// src/main/scala/pe.scala:15:7, :54:23, :58:24
+        validS4 = _RANDOM[3'h7][13];	// src/main/scala/pe.scala:15:7, :54:23, :59:24
       `endif // RANDOMIZE_REG_INIT
     end // initial
-    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/conv.scala:15:7
-      `FIRRTL_AFTER_INITIAL	// src/main/scala/conv.scala:15:7
+    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/pe.scala:15:7
+      `FIRRTL_AFTER_INITIAL	// src/main/scala/pe.scala:15:7
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  AEQ aeqMem (	// src/main/scala/conv.scala:39:22
+  AEQ aeqMem (	// src/main/scala/pe.scala:36:22
     .clock            (clock),
     .reset            (reset),
     .io_writeEnable_0 (io_wr_enable_aeq_0),
@@ -1181,7 +1034,7 @@ module conv(	// src/main/scala/conv.scala:15:7
     .io_writeData_6   (io_writeData_aeq_6),
     .io_writeData_7   (io_writeData_aeq_7),
     .io_writeData_8   (io_writeData_aeq_8),
-    .io_readData_0    (_aeqMem_io_readData_0),
+    .io_readData_0    (io_readData_aeq_0),
     .io_readData_1    (io_readData_aeq_1),
     .io_readData_2    (io_readData_aeq_2),
     .io_readData_3    (io_readData_aeq_3),
@@ -1191,53 +1044,17 @@ module conv(	// src/main/scala/conv.scala:15:7
     .io_readData_7    (io_readData_aeq_7),
     .io_readData_8    (io_readData_aeq_8)
   );
-  mempot mempotMem (	// src/main/scala/conv.scala:40:25
+  mempot mempotMem (	// src/main/scala/pe.scala:37:25
     .clock          (clock),
-    .io_wr_enable_0
-      (_GEN_122
-         ? _GEN_121
-           | (_GEN_20[_c_T_31] ? _GEN_112 | _GEN_103 | _GEN_86 : _GEN_103 | _GEN_86)
-         : _GEN_0),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_1
-      (_GEN_122
-         ? _GEN_123
-           | (_GEN_20[_c_T_31] ? _GEN_113 | _GEN_104 | _GEN_88 : _GEN_104 | _GEN_88)
-         : _GEN_2),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_2
-      (_GEN_122
-         ? _GEN_124
-           | (_GEN_20[_c_T_31] ? _GEN_114 | _GEN_105 | _GEN_90 : _GEN_105 | _GEN_90)
-         : _GEN_4),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_3
-      (_GEN_122
-         ? _GEN_125
-           | (_GEN_20[_c_T_31] ? _GEN_115 | _GEN_106 | _GEN_92 : _GEN_106 | _GEN_92)
-         : _GEN_6),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_4
-      (_GEN_122
-         ? _GEN_126
-           | (_GEN_20[_c_T_31] ? _GEN_116 | _GEN_107 | _GEN_94 : _GEN_107 | _GEN_94)
-         : _GEN_8),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_5
-      (_GEN_122
-         ? _GEN_127
-           | (_GEN_20[_c_T_31] ? _GEN_117 | _GEN_108 | _GEN_96 : _GEN_108 | _GEN_96)
-         : _GEN_10),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_6
-      (_GEN_122
-         ? _GEN_128
-           | (_GEN_20[_c_T_31] ? _GEN_118 | _GEN_109 | _GEN_98 : _GEN_109 | _GEN_98)
-         : _GEN_12),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_7
-      (_GEN_122
-         ? _GEN_129
-           | (_GEN_20[_c_T_31] ? _GEN_119 | _GEN_110 | _GEN_100 : _GEN_110 | _GEN_100)
-         : _GEN_14),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
-    .io_wr_enable_8
-      (_GEN_122
-         ? _GEN_130
-           | (_GEN_20[_c_T_31] ? _GEN_120 | _GEN_111 | _GEN_102 : _GEN_111 | _GEN_102)
-         : _GEN_16),	// src/main/scala/conv.scala:47:26, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :106:42, :107:41
+    .io_wr_enable_0 (validS3 | io_wr_enable_mempot_0),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_1 (validS3 | io_wr_enable_mempot_1),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_2 (validS3 | io_wr_enable_mempot_2),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_3 (validS3 | io_wr_enable_mempot_3),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_4 (validS3 | io_wr_enable_mempot_4),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_5 (validS3 | io_wr_enable_mempot_5),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_6 (validS3 | io_wr_enable_mempot_6),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_7 (validS3 | io_wr_enable_mempot_7),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
+    .io_wr_enable_8 (validS3 | io_wr_enable_mempot_8),	// src/main/scala/pe.scala:44:26, :58:24, :106:17, :108:33
     .io_rd_enable_0 (io_rd_enable_mempot_0),
     .io_rd_enable_1 (io_rd_enable_mempot_1),
     .io_rd_enable_2 (io_rd_enable_mempot_2),
@@ -1265,186 +1082,15 @@ module conv(	// src/main/scala/conv.scala:15:7
     .io_addr_w_6    (io_addr_w_mempot_6),
     .io_addr_w_7    (io_addr_w_mempot_7),
     .io_addr_w_8    (io_addr_w_mempot_8),
-    .io_din_0
-      (_GEN_122
-         ? (_GEN_121
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_112
-                  ? _kernel_added_T_7
-                  : _GEN_103
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_85
-                          ? _kernel_added_T_5
-                          : _GEN_76
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_58
-                                  ? _kernel_added_T_3
-                                  : _GEN_49
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_31
-                                          ? _kernel_added_T_1
-                                          : _GEN_21 ? _kernel_added_T : _GEN_1)
-         : _GEN_1),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_1
-      (_GEN_122
-         ? (_GEN_123
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_113
-                  ? _kernel_added_T_7
-                  : _GEN_104
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_87
-                          ? _kernel_added_T_5
-                          : _GEN_77
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_60
-                                  ? _kernel_added_T_3
-                                  : _GEN_50
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_33
-                                          ? _kernel_added_T_1
-                                          : _GEN_22 ? _kernel_added_T : _GEN_3)
-         : _GEN_3),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_2
-      (_GEN_122
-         ? (_GEN_124
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_114
-                  ? _kernel_added_T_7
-                  : _GEN_105
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_89
-                          ? _kernel_added_T_5
-                          : _GEN_78
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_62
-                                  ? _kernel_added_T_3
-                                  : _GEN_51
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_35
-                                          ? _kernel_added_T_1
-                                          : _GEN_23 ? _kernel_added_T : _GEN_5)
-         : _GEN_5),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_3
-      (_GEN_122
-         ? (_GEN_125
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_115
-                  ? _kernel_added_T_7
-                  : _GEN_106
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_91
-                          ? _kernel_added_T_5
-                          : _GEN_79
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_64
-                                  ? _kernel_added_T_3
-                                  : _GEN_52
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_37
-                                          ? _kernel_added_T_1
-                                          : _GEN_24 ? _kernel_added_T : _GEN_7)
-         : _GEN_7),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_4
-      (_GEN_122
-         ? (_GEN_126
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_116
-                  ? _kernel_added_T_7
-                  : _GEN_107
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_93
-                          ? _kernel_added_T_5
-                          : _GEN_80
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_66
-                                  ? _kernel_added_T_3
-                                  : _GEN_53
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_39
-                                          ? _kernel_added_T_1
-                                          : _GEN_25 ? _kernel_added_T : _GEN_9)
-         : _GEN_9),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_5
-      (_GEN_122
-         ? (_GEN_127
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_117
-                  ? _kernel_added_T_7
-                  : _GEN_108
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_95
-                          ? _kernel_added_T_5
-                          : _GEN_81
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_68
-                                  ? _kernel_added_T_3
-                                  : _GEN_54
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_41
-                                          ? _kernel_added_T_1
-                                          : _GEN_26 ? _kernel_added_T : _GEN_11)
-         : _GEN_11),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_6
-      (_GEN_122
-         ? (_GEN_128
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_118
-                  ? _kernel_added_T_7
-                  : _GEN_109
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_97
-                          ? _kernel_added_T_5
-                          : _GEN_82
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_70
-                                  ? _kernel_added_T_3
-                                  : _GEN_55
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_43
-                                          ? _kernel_added_T_1
-                                          : _GEN_27 ? _kernel_added_T : _GEN_13)
-         : _GEN_13),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_7
-      (_GEN_122
-         ? (_GEN_129
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_119
-                  ? _kernel_added_T_7
-                  : _GEN_110
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_99
-                          ? _kernel_added_T_5
-                          : _GEN_83
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_72
-                                  ? _kernel_added_T_3
-                                  : _GEN_56
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_45
-                                          ? _kernel_added_T_1
-                                          : _GEN_28 ? _kernel_added_T : _GEN_15)
-         : _GEN_15),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
-    .io_din_8
-      (_GEN_122
-         ? (_GEN_130
-              ? _kernel_added_T_8
-              : _GEN_20[_c_T_31] & _GEN_120
-                  ? _kernel_added_T_7
-                  : _GEN_111
-                      ? _kernel_added_T_6
-                      : _GEN_20[_c_T_23] & _GEN_101
-                          ? _kernel_added_T_5
-                          : _GEN_84
-                              ? _kernel_added_T_4
-                              : _GEN_20[_c_T_15] & _GEN_74
-                                  ? _kernel_added_T_3
-                                  : _GEN_57
-                                      ? _kernel_added_T_2
-                                      : _GEN_20[_c_T_7] & _GEN_47
-                                          ? _kernel_added_T_1
-                                          : _GEN_29 ? _kernel_added_T : _GEN_17)
-         : _GEN_17),	// src/main/scala/conv.scala:51:20, :65:14, :74:30, :87:55, :88:28, :91:24, :101:32, :104:43, :106:42, :107:41, :108:35
+    .io_din_0       (validS3 ? s3_updates_0 : io_din_mempot_0),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_1       (validS3 ? s3_updates_1 : io_din_mempot_1),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_2       (validS3 ? s3_updates_2 : io_din_mempot_2),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_3       (validS3 ? s3_updates_3 : io_din_mempot_3),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_4       (validS3 ? s3_updates_4 : io_din_mempot_4),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_5       (validS3 ? s3_updates_5 : io_din_mempot_5),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_6       (validS3 ? s3_updates_6 : io_din_mempot_6),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_7       (validS3 ? s3_updates_7 : io_din_mempot_7),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
+    .io_din_8       (validS3 ? s3_updates_8 : io_din_mempot_8),	// src/main/scala/pe.scala:48:20, :54:23, :58:24, :106:17, :109:27
     .io_dout_0      (_mempotMem_io_dout_0),
     .io_dout_1      (_mempotMem_io_dout_1),
     .io_dout_2      (_mempotMem_io_dout_2),
@@ -1455,15 +1101,14 @@ module conv(	// src/main/scala/conv.scala:15:7
     .io_dout_7      (_mempotMem_io_dout_7),
     .io_dout_8      (_mempotMem_io_dout_8)
   );
-  assign io_readData_aeq_0 = _aeqMem_io_readData_0;	// src/main/scala/conv.scala:15:7, :39:22
-  assign io_dout_mempot_0 = _mempotMem_io_dout_0;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_1 = _mempotMem_io_dout_1;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_2 = _mempotMem_io_dout_2;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_3 = _mempotMem_io_dout_3;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_4 = _mempotMem_io_dout_4;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_5 = _mempotMem_io_dout_5;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_6 = _mempotMem_io_dout_6;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_7 = _mempotMem_io_dout_7;	// src/main/scala/conv.scala:15:7, :40:25
-  assign io_dout_mempot_8 = _mempotMem_io_dout_8;	// src/main/scala/conv.scala:15:7, :40:25
+  assign io_dout_mempot_0 = _mempotMem_io_dout_0;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_1 = _mempotMem_io_dout_1;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_2 = _mempotMem_io_dout_2;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_3 = _mempotMem_io_dout_3;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_4 = _mempotMem_io_dout_4;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_5 = _mempotMem_io_dout_5;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_6 = _mempotMem_io_dout_6;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_7 = _mempotMem_io_dout_7;	// src/main/scala/pe.scala:15:7, :37:25
+  assign io_dout_mempot_8 = _mempotMem_io_dout_8;	// src/main/scala/pe.scala:15:7, :37:25
 endmodule
 
