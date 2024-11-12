@@ -1,4 +1,4 @@
-[debug] [chisel_snn_rahul-test] Classpath dependencies List()
-[debug] [chisel_snn_rahul-test] Dependencies from configurations List(chisel_snn_rahul)
-[debug] Bloop wrote the configuration of project 'chisel_snn_rahul-test' to '/home/rahul/Documents/BTP/SNN_Chisel/chisel_snn_rahul/.bloop/chisel_snn_rahul-test.json'
-[success] Generated .bloop/chisel_snn_rahul-test.json
+[debug] [chisel_codes-test] Classpath dependencies List()
+[debug] [chisel_codes-test] Dependencies from configurations List(chisel_codes)
+[debug] Bloop wrote the configuration of project 'chisel_codes-test' to '/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/.bloop/chisel_codes-test.json'
+[success] Generated .bloop/chisel_codes-test.json
