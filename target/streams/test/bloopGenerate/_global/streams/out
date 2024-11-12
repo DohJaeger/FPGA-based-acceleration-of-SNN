@@ -1,4 +1,0 @@
-[debug] [fpga-acceleration-of-snn-test] Classpath dependencies List()
-[debug] [fpga-acceleration-of-snn-test] Dependencies from configurations List(fpga-acceleration-of-snn)
-[debug] Bloop wrote the configuration of project 'fpga-acceleration-of-snn-test' to '/home/rahul/FPGA-acceleration-of-SNN/.bloop/fpga-acceleration-of-snn-test.json'
-[success] Generated .bloop/fpga-acceleration-of-snn-test.json

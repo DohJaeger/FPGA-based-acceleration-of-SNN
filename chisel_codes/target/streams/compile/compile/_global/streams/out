@@ -1,4 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/pe.scala:37:37: no arguments allowed for nullary constructor mempot: (): mempot[0m
-[0m[[0m[31merror[0m] [0m[0m  val mempotMem = Module(new mempot(mempotSize, memPixelWidth))[0m
-[0m[[0m[31merror[0m] [0m[0m                                    ^[0m
-[0m[[0m[31merror[0m] [0m[0mone error found[0m
