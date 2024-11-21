@@ -248,8 +248,8 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
             io.wr_data_L2_S(1) := s3_conv(7)
 
             io.wr_en_L2_S(2) := true.B
-            io.wr_addr_L2_S(2) := s1_addr_calc(7)
-            io.wr_data_L2_S(2) := s3_conv(7)
+            io.wr_addr_L2_S(2) := s1_addr_calc(8)
+            io.wr_data_L2_S(2) := s3_conv(8)
 
         } .elsewhen (((s1_addr_calc(0))(8,4) < 9.U(4.W)) && ((s1_addr_calc(0)(3,0)) < 3.U(4.W))) {
 
