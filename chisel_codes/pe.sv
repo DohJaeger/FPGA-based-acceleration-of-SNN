@@ -900,11 +900,11 @@ module pe(	// src/main/scala/pe.scala:15:7
   reg        validS4;	// src/main/scala/pe.scala:59:24
   always @(posedge clock) begin	// src/main/scala/pe.scala:15:7
     automatic logic _GEN;	// src/main/scala/pe.scala:67:18
-    automatic logic _GEN_0;	// src/main/scala/pe.scala:89:18
-    automatic logic _GEN_1;	// src/main/scala/pe.scala:97:18
+    automatic logic _GEN_0;	// src/main/scala/pe.scala:89:16
+    automatic logic _GEN_1;	// src/main/scala/pe.scala:97:16
     _GEN = validS2 & validS3;	// src/main/scala/pe.scala:57:24, :58:24, :67:18
-    _GEN_0 = validS1 & ~_GEN;	// src/main/scala/pe.scala:56:24, :67:18, :73:30, :89:18
-    _GEN_1 = validS2 & ~_GEN;	// src/main/scala/pe.scala:57:24, :67:18, :73:30, :97:18
+    _GEN_0 = validS1 & ~_GEN;	// src/main/scala/pe.scala:56:24, :67:18, :73:28, :89:16
+    _GEN_1 = validS2 & ~_GEN;	// src/main/scala/pe.scala:57:24, :67:18, :73:28, :97:16
     if (validS2 & validS4) begin	// src/main/scala/pe.scala:57:24, :59:24, :115:16
       s2_memRead_0 <= s3_updates_0;	// src/main/scala/pe.scala:53:23, :54:23
       s2_memRead_1 <= s3_updates_1;	// src/main/scala/pe.scala:53:23, :54:23
@@ -916,7 +916,7 @@ module pe(	// src/main/scala/pe.scala:15:7
       s2_memRead_7 <= s3_updates_7;	// src/main/scala/pe.scala:53:23, :54:23
       s2_memRead_8 <= s3_updates_8;	// src/main/scala/pe.scala:53:23, :54:23
     end
-    else if (_GEN_0) begin	// src/main/scala/pe.scala:89:18
+    else if (_GEN_0) begin	// src/main/scala/pe.scala:89:16
       s2_memRead_0 <= _mempotMem_io_dout_0;	// src/main/scala/pe.scala:37:25, :53:23
       s2_memRead_1 <= _mempotMem_io_dout_1;	// src/main/scala/pe.scala:37:25, :53:23
       s2_memRead_2 <= _mempotMem_io_dout_2;	// src/main/scala/pe.scala:37:25, :53:23
@@ -927,34 +927,34 @@ module pe(	// src/main/scala/pe.scala:15:7
       s2_memRead_7 <= _mempotMem_io_dout_7;	// src/main/scala/pe.scala:37:25, :53:23
       s2_memRead_8 <= _mempotMem_io_dout_8;	// src/main/scala/pe.scala:37:25, :53:23
     end
-    if (_GEN_1) begin	// src/main/scala/pe.scala:97:18
-      automatic logic [8:0] _update_T;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_1;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_2;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_3;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_4;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_5;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_6;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_7;	// src/main/scala/pe.scala:99:36
-      automatic logic [8:0] _update_T_8;	// src/main/scala/pe.scala:99:36
-      _update_T = s2_memRead_0 + {1'h0, io_kernel_0};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_1 = s2_memRead_1 + {1'h0, io_kernel_1};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_2 = s2_memRead_2 + {1'h0, io_kernel_2};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_3 = s2_memRead_3 + {1'h0, io_kernel_3};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_4 = s2_memRead_4 + {1'h0, io_kernel_4};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_5 = s2_memRead_5 + {1'h0, io_kernel_5};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_6 = s2_memRead_6 + {1'h0, io_kernel_6};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_7 = s2_memRead_7 + {1'h0, io_kernel_7};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      _update_T_8 = s2_memRead_8 + {1'h0, io_kernel_8};	// src/main/scala/pe.scala:53:23, :56:24, :99:36
-      s3_updates_0 <= _update_T[8] ? 9'hFF : _update_T;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_1 <= _update_T_1[8] ? 9'hFF : _update_T_1;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_2 <= _update_T_2[8] ? 9'hFF : _update_T_2;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_3 <= _update_T_3[8] ? 9'hFF : _update_T_3;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_4 <= _update_T_4[8] ? 9'hFF : _update_T_4;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_5 <= _update_T_5[8] ? 9'hFF : _update_T_5;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_6 <= _update_T_6[8] ? 9'hFF : _update_T_6;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_7 <= _update_T_7[8] ? 9'hFF : _update_T_7;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
-      s3_updates_8 <= _update_T_8[8] ? 9'hFF : _update_T_8;	// src/main/scala/pe.scala:54:23, :99:36, :100:{29,37}
+    if (_GEN_1) begin	// src/main/scala/pe.scala:97:16
+      automatic logic [8:0] _update_T;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_1;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_2;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_3;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_4;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_5;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_6;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_7;	// src/main/scala/pe.scala:99:34
+      automatic logic [8:0] _update_T_8;	// src/main/scala/pe.scala:99:34
+      _update_T = s2_memRead_0 + {1'h0, io_kernel_0};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_1 = s2_memRead_1 + {1'h0, io_kernel_1};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_2 = s2_memRead_2 + {1'h0, io_kernel_2};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_3 = s2_memRead_3 + {1'h0, io_kernel_3};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_4 = s2_memRead_4 + {1'h0, io_kernel_4};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_5 = s2_memRead_5 + {1'h0, io_kernel_5};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_6 = s2_memRead_6 + {1'h0, io_kernel_6};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_7 = s2_memRead_7 + {1'h0, io_kernel_7};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      _update_T_8 = s2_memRead_8 + {1'h0, io_kernel_8};	// src/main/scala/pe.scala:53:23, :56:24, :99:34
+      s3_updates_0 <= _update_T[8] ? 9'hFF : _update_T;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_1 <= _update_T_1[8] ? 9'hFF : _update_T_1;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_2 <= _update_T_2[8] ? 9'hFF : _update_T_2;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_3 <= _update_T_3[8] ? 9'hFF : _update_T_3;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_4 <= _update_T_4[8] ? 9'hFF : _update_T_4;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_5 <= _update_T_5[8] ? 9'hFF : _update_T_5;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_6 <= _update_T_6[8] ? 9'hFF : _update_T_6;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_7 <= _update_T_7[8] ? 9'hFF : _update_T_7;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
+      s3_updates_8 <= _update_T_8[8] ? 9'hFF : _update_T_8;	// src/main/scala/pe.scala:54:23, :99:34, :100:{27,35}
     end
     if (reset) begin	// src/main/scala/pe.scala:15:7
       validS1 <= 1'h0;	// src/main/scala/pe.scala:56:24
@@ -964,11 +964,11 @@ module pe(	// src/main/scala/pe.scala:15:7
     end
     else begin	// src/main/scala/pe.scala:15:7
       automatic logic _GEN_2;	// src/main/scala/pe.scala:122:16
-      _GEN_2 = validS4 & ~_GEN;	// src/main/scala/pe.scala:59:24, :67:18, :73:30, :122:16
-      validS1 <= ~_GEN_2 & (io_rd_enable_aeq & ~_GEN | validS1);	// src/main/scala/pe.scala:56:24, :67:18, :73:{27,30,46}, :85:17, :122:{16,35}, :123:13
-      validS2 <= ~_GEN_2 & (_GEN_0 | validS2);	// src/main/scala/pe.scala:57:24, :73:46, :89:{18,37}, :93:17, :122:{16,35}, :123:13, :124:13
-      validS3 <= ~_GEN_2 & (_GEN_1 | validS3);	// src/main/scala/pe.scala:58:24, :73:46, :97:{18,37}, :102:17, :122:{16,35}, :123:13, :125:13
-      validS4 <= ~_GEN_2 & (validS3 | validS4);	// src/main/scala/pe.scala:58:24, :59:24, :73:46, :106:17, :111:13, :122:{16,35}, :123:13, :126:13
+      _GEN_2 = validS4 & ~_GEN;	// src/main/scala/pe.scala:59:24, :67:18, :73:28, :122:16
+      validS1 <= ~_GEN_2 & (io_rd_enable_aeq & ~_GEN | validS1);	// src/main/scala/pe.scala:56:24, :67:18, :73:{25,28,44}, :85:15, :122:{16,35}, :123:13
+      validS2 <= ~_GEN_2 & (_GEN_0 | validS2);	// src/main/scala/pe.scala:57:24, :73:44, :89:{16,35}, :93:15, :122:{16,35}, :123:13, :124:13
+      validS3 <= ~_GEN_2 & (_GEN_1 | validS3);	// src/main/scala/pe.scala:58:24, :73:44, :97:{16,35}, :102:15, :122:{16,35}, :123:13, :125:13
+      validS4 <= ~_GEN_2 & (validS3 | validS4);	// src/main/scala/pe.scala:58:24, :59:24, :73:44, :106:17, :111:13, :122:{16,35}, :123:13, :126:13
     end
   end // always @(posedge)
   `ifdef ENABLE_INITIAL_REG_	// src/main/scala/pe.scala:15:7

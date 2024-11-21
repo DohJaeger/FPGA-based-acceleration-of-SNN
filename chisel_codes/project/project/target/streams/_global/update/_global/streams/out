@@ -1,0 +1,3 @@
+[debug] not up to date. inChanged = true, force = false
+[debug] Updating ProjectRef(uri("file:/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/project/project/"), "chisel_codes-build-build")...
+[debug] Done updating ProjectRef(uri("file:/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/project/project/"), "chisel_codes-build-build")

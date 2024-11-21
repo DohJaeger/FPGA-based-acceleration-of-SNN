@@ -14,8 +14,6 @@ import org.scalatest.freespec.AnyFreeSpec
 import java.io.File
 import java.io.PrintWriter
 
-
-//Just to test the generation of BRAM
  class Memory (depth : Int , width : Int) extends Module {
  val io = IO(new Bundle {
  val rdAddr = Input(UInt(log2Ceil(depth).W))
@@ -36,7 +34,7 @@ import java.io.PrintWriter
    mem.write(io.wrAddr, io.wrData)
  }
 }
-object Memory extends App {
+object sync_mem extends App {
   val verilogString = chisel3.getVerilogString(new Memory(1024,28))
   val verilogFile = new File("sync_mem.sv")
   val writer = new PrintWriter(verilogFile)

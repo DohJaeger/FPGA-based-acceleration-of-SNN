@@ -1,0 +1,21 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(run, Some(96f57f72-36d5-44db-bd74-6122798139d9), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / run[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /home/rahul/FPGA-acceleration-of-SNN/chisel_codes/target/scala-2.13/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:364:21: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                    s3_thresh_aeq_out_data(i) := Cat(1.U(1.W), s3_thresh_blk_counter, i.U(4.W), 1.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:370:21: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                    s3_thresh_aeq_out_data(i) := Cat(0.U(1.W), s3_thresh_blk_counter, i.U(4.W), 1.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:384:18: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m            when(s3_thresh_aeq_out_data(i)(0)){[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:386:37: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                io.wr_data_aeq_o := s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m
+[0m[[0m[0mdebug[0m] [0m[0mForcing garbage collection...[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 0 s, completed Nov 21, 2024, 3:12:14 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m

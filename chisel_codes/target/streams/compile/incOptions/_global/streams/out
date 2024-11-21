@@ -1,27 +1,17 @@
 [0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/rahul/FPGA-acceleration-of-SNN/chisel_codes/target/scala-2.13/classes.bak[0m
 [0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
-[0m[[0m[0mdebug[0m] [0m[0mCreated transactional ClassFileManager with tempDir = /home/rahul/FPGA-acceleration-of-SNN/chisel_codes/target/scala-2.13/classes.bak[0m
-[0m[[0m[0mdebug[0m] [0m[0mAbout to delete class files:[0m
-[0m[[0m[0mdebug[0m] [0m[0mWe backup class files:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
-[0m[[0m[0mdebug[0m] [0m[0m	mempot$.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	mempot$$anon$1.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Memory$$anon$1.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Memory$.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	AEQ.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Main$delayedInit$body.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Memory$delayedInit$body.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Main.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	pe.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	pe$delayedInit$body.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	MultiMemory.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Main$.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	Memory.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	AEQ$$anon$1.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	mempot$delayedInit$body.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	pe$$anon$1.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	MultiMemory$$anon$1.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	pe$.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	mempot.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$delayedInit$body.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	tile.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /home/rahul/FPGA-acceleration-of-SNN/chisel_codes/target/scala-2.13/classes.bak[0m

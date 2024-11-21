@@ -1,0 +1,301 @@
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:6:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:7:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.util._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:8:8: not found: object chiseltest[0m
+[0m[[0m[31merror[0m] [0m[0mimport chiseltest._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:9:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.flatspec.AnyFlatSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:10:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.freespec.AnyFreeSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:45:43: illegal inheritance from final class Module[0m
+[0m[[0m[31merror[0m] [0m[0mclass AEQ(depth: Int, width: Int) extends Module {[0m
+[0m[[0m[31merror[0m] [0m[0m                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:46:12: not found: value IO[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle {[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:46:19: not found: type Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle {[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:47:23: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeEnable = Input(Vec(9, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:47:29: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeEnable = Input(Vec(9, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:47:36: not found: value Bool[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeEnable = Input(Vec(9, Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:48:22: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m    val readEnable = Input(Bool())[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:48:28: not found: value Bool[0m
+[0m[[0m[31merror[0m] [0m[0m    val readEnable = Input(Bool())[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:49:21: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeData = Input(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:49:27: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeData = Input(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:49:34: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeData = Input(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:49:41: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m    val writeData = Input(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:50:20: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m    val readData = Output(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:50:27: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val readData = Output(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:50:34: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m    val readData = Output(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:50:41: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m    val readData = Output(Vec(9, UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:53:18: class java.lang.Module is not a value[0m
+[0m[[0m[31merror[0m] [0m[0m  val multiMem = Module(new MultiMemory(depth, width, 9))[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:7:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:8:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.util._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:9:8: not found: object chiseltest[0m
+[0m[[0m[31merror[0m] [0m[0mimport chiseltest._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:55:23: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m  val writeCounters = RegInit(VecInit(Seq.fill(9)(0.U(8.W))))[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:55:31: not found: value VecInit[0m
+[0m[[0m[31merror[0m] [0m[0m  val writeCounters = RegInit(VecInit(Seq.fill(9)(0.U(8.W))))[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:55:53: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val writeCounters = RegInit(VecInit(Seq.fill(9)(0.U(8.W))))[0m
+[0m[[0m[31merror[0m] [0m[0m                                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:55:57: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val writeCounters = RegInit(VecInit(Seq.fill(9)(0.U(8.W))))[0m
+[0m[[0m[31merror[0m] [0m[0m                                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:56:21: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m  val readCounter = RegInit(0.U(8.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:56:31: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val readCounter = RegInit(0.U(8.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:56:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val readCounter = RegInit(0.U(8.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:57:29: not found: value RegInit[0m
+[0m[[0m[31merror[0m] [0m[0m  val columnSelectCounter = RegInit(0.U(4.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:57:39: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val columnSelectCounter = RegInit(0.U(4.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:57:43: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val columnSelectCounter = RegInit(0.U(4.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:70:3: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m  when(io.readEnable) {[0m
+[0m[[0m[31merror[0m] [0m[0m  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:77:5: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m    when(readCounter === (depth - 1).U) {[0m
+[0m[[0m[31merror[0m] [0m[0m    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:79:7: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m      when(columnSelectCounter === 8.U) {[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:87:5: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m    when(io.writeEnable(i)) {[0m
+[0m[[0m[31merror[0m] [0m[0m    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:88:18: not found: value Cat[0m
+[0m[[0m[31merror[0m] [0m[0m      val data = Cat(0.U(1.W), io.writeData(i), 1.U(1.W)) // Concatenate valid bit, data, EOQ bit[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:88:24: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m      val data = Cat(0.U(1.W), io.writeData(i), 1.U(1.W)) // Concatenate valid bit, data, EOQ bit[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:88:28: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m      val data = Cat(0.U(1.W), io.writeData(i), 1.U(1.W)) // Concatenate valid bit, data, EOQ bit[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:88:51: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m      val data = Cat(0.U(1.W), io.writeData(i), 1.U(1.W)) // Concatenate valid bit, data, EOQ bit[0m
+[0m[[0m[31merror[0m] [0m[0m                                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:88:55: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m      val data = Cat(0.U(1.W), io.writeData(i), 1.U(1.W)) // Concatenate valid bit, data, EOQ bit[0m
+[0m[[0m[31merror[0m] [0m[0m                                                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:93:7: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m      when(writeCounters(i) === (depth - 1).U) {[0m
+[0m[[0m[31merror[0m] [0m[0m      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:94:24: not found: value Cat[0m
+[0m[[0m[31merror[0m] [0m[0m        val lastData = Cat(1.U(1.W), io.writeData(i), 1.U(1.W)) // Set EOQ bit for the last entry[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:94:30: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val lastData = Cat(1.U(1.W), io.writeData(i), 1.U(1.W)) // Set EOQ bit for the last entry[0m
+[0m[[0m[31merror[0m] [0m[0m                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:94:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val lastData = Cat(1.U(1.W), io.writeData(i), 1.U(1.W)) // Set EOQ bit for the last entry[0m
+[0m[[0m[31merror[0m] [0m[0m                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:94:57: value U is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val lastData = Cat(1.U(1.W), io.writeData(i), 1.U(1.W)) // Set EOQ bit for the last entry[0m
+[0m[[0m[31merror[0m] [0m[0m                                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:94:61: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m        val lastData = Cat(1.U(1.W), io.writeData(i), 1.U(1.W)) // Set EOQ bit for the last entry[0m
+[0m[[0m[31merror[0m] [0m[0m                                                            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/aeq.scala:104:23: not found: value chisel3[0m
+[0m[[0m[31merror[0m] [0m[0m  val verilogString = chisel3.getVerilogString(new AEQ(256, 11))[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:6:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:7:8: not found: object chisel3[0m
+[0m[[0m[31merror[0m] [0m[0mimport chisel3.util._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:8:8: not found: object chiseltest[0m
+[0m[[0m[31merror[0m] [0m[0mimport chiseltest._[0m
+[0m[[0m[31merror[0m] [0m[0m       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:9:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.flatspec.AnyFlatSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:10:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.freespec.AnyFreeSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:43:60: illegal inheritance from final class Module[0m
+[0m[[0m[31merror[0m] [0m[0mclass mempot (mempotSize: Int, memPixelWidth: Int) extends Module{ //mempixelWidht --> size of pizel //mempotSize --> size of output feature map[0m
+[0m[[0m[31merror[0m] [0m[0m                                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:44:12: not found: value IO[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:44:19: not found: type Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle{[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:45:19: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m  val wr_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:45:25: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val wr_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:45:31: not found: value Bool[0m
+[0m[[0m[31merror[0m] [0m[0m  val wr_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:46:19: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m  val rd_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:46:25: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val rd_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:46:31: not found: value Bool[0m
+[0m[[0m[31merror[0m] [0m[0m  val rd_enable = Input(Vec(9,Bool()))[0m
+[0m[[0m[31merror[0m] [0m[0m                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:47:16: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_r = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:47:22: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_r = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:47:28: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_r = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:47:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_r = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:48:16: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_w = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:48:22: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_w = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                     ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:48:28: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_w = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:48:35: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val addr_w = Input(Vec(9,UInt(8.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:49:13: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m  val din = Input(Vec(9,UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m            ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:49:19: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val din = Input(Vec(9,UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:49:25: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m  val din = Input(Vec(9,UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:49:32: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val din = Input(Vec(9,UInt(9.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:50:14: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m  val dout = Output(Vec(9,UInt(9.W))) //widht of mem is 9 here[0m
+[0m[[0m[31merror[0m] [0m[0m             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:50:21: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m  val dout = Output(Vec(9,UInt(9.W))) //widht of mem is 9 here[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:50:27: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m  val dout = Output(Vec(9,UInt(9.W))) //widht of mem is 9 here[0m
+[0m[[0m[31merror[0m] [0m[0m                          ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:50:34: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m  val dout = Output(Vec(9,UInt(9.W))) //widht of mem is 9 here[0m
+[0m[[0m[31merror[0m] [0m[0m                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:55:18: class java.lang.Module is not a value[0m
+[0m[[0m[31merror[0m] [0m[0m  val multiMem = Module(new MultiMemory(mempotColDepth, memPixelWidth, 9)) //last bit as a spike indicator //9 --> # parallel columns[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:66:5: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m    when (io.rd_enable(i)){[0m
+[0m[[0m[31merror[0m] [0m[0m    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:72:5: not found: value when[0m
+[0m[[0m[31merror[0m] [0m[0m    when (!io.rd_enable(i) && io.wr_enable(i)){[0m
+[0m[[0m[31merror[0m] [0m[0m    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/mempot.scala:81:23: not found: value chisel3[0m
+[0m[[0m[31merror[0m] [0m[0m  val verilogString = chisel3.getVerilogString(new mempot(48, 9))[0m
+[0m[[0m[31merror[0m] [0m[0m                      ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:10:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.flatspec.AnyFlatSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:11:12: object scalatest is not a member of package org[0m
+[0m[[0m[31merror[0m] [0m[0mimport org.scalatest.freespec.AnyFreeSpec[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:17:69: illegal inheritance from final class Module[0m
+[0m[[0m[31merror[0m] [0m[0mclass MultiMemory(depth: Int, width: Int, numMemories: Int) extends Module {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:18:12: not found: value IO[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle {[0m
+[0m[[0m[31merror[0m] [0m[0m           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:18:19: not found: type Bundle[0m
+[0m[[0m[31merror[0m] [0m[0m  val io = IO(new Bundle {[0m
+[0m[[0m[31merror[0m] [0m[0m                  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:19:18: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:19:24: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:19:41: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:19:46: not found: value log2Ceil[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                             ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:20:18: not found: value Output[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdData = Output(Vec(numMemories, UInt(width.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:20:25: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdData = Output(Vec(numMemories, UInt(width.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:20:42: not found: value UInt[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdData = Output(Vec(numMemories, UInt(width.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                         ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:20:53: value W is not a member of Int[0m
+[0m[[0m[31merror[0m] [0m[0m    val rdData = Output(Vec(numMemories, UInt(width.W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:21:18: not found: value Input[0m
+[0m[[0m[31merror[0m] [0m[0m    val wrAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/multi_sync_mem.scala:21:24: not found: value Vec[0m
+[0m[[0m[31merror[0m] [0m[0m    val wrAddr = Input(Vec(numMemories, UInt(log2Ceil(depth).W)))[0m
+[0m[[0m[31merror[0m] [0m[0m                       ^[0m
+[0m[[0m[31merror[0m] [0m[0m100 errors found[0m

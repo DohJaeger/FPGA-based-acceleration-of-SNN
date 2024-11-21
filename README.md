@@ -1,1 +1,1 @@
-# FPGA-acceleration-of-SNN
+# FPGA-based-acceleration-of-SNN

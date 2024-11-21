@@ -1,0 +1,13 @@
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:364:21: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                    s3_thresh_aeq_out_data(i) := Cat(1.U(1.W), s3_thresh_blk_counter, i.U(4.W), 1.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:370:21: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                    s3_thresh_aeq_out_data(i) := Cat(0.U(1.W), s3_thresh_blk_counter, i.U(4.W), 1.U(1.W))[0m
+[0m[[0m[31merror[0m] [0m[0m                    ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:384:18: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m            when(s3_thresh_aeq_out_data(i)(0)){[0m
+[0m[[0m[31merror[0m] [0m[0m                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/tile.scala:386:37: not found: value s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                io.wr_data_aeq_o := s3_thresh_aeq_out_data[0m
+[0m[[0m[31merror[0m] [0m[0m                                    ^[0m
+[0m[[0m[31merror[0m] [0m[0mfour errors found[0m

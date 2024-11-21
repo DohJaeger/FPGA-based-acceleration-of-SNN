@@ -1,0 +1,14 @@
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(run, Some(3dfe15b9-e9f9-420a-990d-ce4f0109aecf), Some(CommandSource(console0)))[0m
+[0m[[0m[0mdebug[0m] [0m[0mEvaluating tasks: Compile / run[0m
+[0m[[0m[0mdebug[0m] [0m[0mRunning task... Cancel: Signal, check cycles: false, forcegc: true[0m
+[0m[[0m[0minfo[0m] [0m[0mcompiling 1 Scala source to /home/rahul/FPGA-acceleration-of-SNN/chisel_codes/target/scala-2.13/classes ...[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/flex_bram.scala:112:20: illegal start of simple expression[0m
+[0m[[0m[31merror[0m] [0m[0m    rdataaR(ii) := if (bitsDH > 0) Cat(io.wdataa(bitsD - 1, bitsDL), lowBitsA) else lowBitsA[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/src/main/scala/flex_bram.scala:113:20: illegal start of simple expression[0m
+[0m[[0m[31merror[0m] [0m[0m    rdatabR(ii) := if (bitsDH > 0) Cat(io.wdatab(bitsD - 1, bitsDL), lowBitsB) else lowBitsB[0m
+[0m[[0m[31merror[0m] [0m[0m                   ^[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
+[0m[[0m[31merror[0m] [0m[0m(Compile / [31mcompileIncremental[0m) Compilation failed[0m
+[0m[[0m[31merror[0m] [0m[0mTotal time: 0 s, completed Nov 13, 2024, 6:51:26 PM[0m
+[0m[[0m[0mdebug[0m] [0m[0m> Exec(shell, None, None)[0m
