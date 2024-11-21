@@ -7,3 +7,4 @@ chisel_codes/.bloop
 chisel_codes/project
 chisel_codes/.bsp
 chisel_codes/target
+chisel_codes/src/main/scala/target
