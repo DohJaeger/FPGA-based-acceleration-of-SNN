@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1731427906" />
-    <testcase name="test_pe" classname="test_pe" file="/home/rahul/FPGA-acceleration-of-SNN/chisel_codes/testbench/test_pe.py" lineno="19" time="0.00026154518127441406" sim_time_ns="0.001" ratio_time="3.8234311759343664">
-      <failure message="Test failed with RANDOM_SEED=1731427906" />
-    </testcase>
-  </testsuite>
-</testsuites>
