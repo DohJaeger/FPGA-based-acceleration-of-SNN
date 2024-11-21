@@ -3,3 +3,7 @@
 .vscode/
 target/
 project/
+chisel_codes/.bloop
+chisel_codes/project
+chisel_codes/.bsp
+chisel_codes/target
