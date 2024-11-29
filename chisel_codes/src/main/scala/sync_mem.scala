@@ -14,28 +14,63 @@ import org.scalatest.freespec.AnyFreeSpec
 import java.io.File
 import java.io.PrintWriter
 
- class Memory (depth : Int , width : Int) extends Module {
+ class mem (depth : Int , width : Int) extends Module {
  val io = IO(new Bundle {
- val rdAddr = Input(UInt(log2Ceil(depth).W))
- val rdData = Output(UInt(width.W))
- val wrAddr = Input(UInt(log2Ceil(depth).W))
- val wrData = Input(UInt(width.W))
- val wrEna = Input(Bool())
- val rdEna = Input(Bool())
+ val rd_addr = Input(UInt(log2Ceil(depth).W))
+ val rd_data = Output(UInt(width.W))
+ val wr_addr = Input(UInt(log2Ceil(depth).W))
+ val wr_data = Input(UInt(width.W))
+ val wr_en = Input(Bool())
+ val rd_en = Input(Bool())
  })
- val mem = SyncReadMem(depth, UInt(width.W)) //Synchronous Read Write Memory
- io.rdData := DontCare
- when (io.rdEna){
+ val mem = SyncReadMem(depth, UInt(width.W)) //Synchronous Read Write mem
+ io.rd_data := DontCare
+ when (io.rd_en){
 
-   io.rdData := mem.read(io.rdAddr)
+   io.rd_data := mem.read(io.rd_addr)
  }
 
- when(io.wrEna) {
-   mem.write(io.wrAddr, io.wrData)
+ when(io.wr_en) {
+   mem.write(io.wr_addr, io.wr_data)
  }
 }
+
+// class mem(depth: Int, width: Int) extends Module {
+//   val io = IO(new Bundle {
+//     val rd_addr = Input(UInt(log2Ceil(depth).W))
+//     val rd_data = Output(UInt(width.W))
+//     val rd_valid = Output(Bool())
+//     val wr_addr = Input(UInt(log2Ceil(depth).W))
+//     val wr_data = Input(UInt(width.W))
+//     val wr_en = Input(Bool())
+//     val rd_en = Input(Bool())
+//   })
+
+//   val mem = SyncReadMem(depth, UInt(width.W))
+  
+//   val rd_data_reg = RegInit(0.U(width.W))
+//   val rd_valid_reg = RegInit(false.B)
+  
+//   io.rd_data := rd_data_reg
+//   io.rd_valid := rd_valid_reg
+
+//   // Synchronous Read
+//   when(io.rd_en) {
+//     rd_data_reg := mem.read(io.rd_addr)
+//     rd_valid_reg := true.B
+//   } .otherwise {
+//     rd_valid_reg := false.B
+//     rd_valid_reg := false.B
+//   }
+
+//   // Synchronous Write
+//   when(io.wr_en) {
+//     mem.write(io.wr_addr, io.wr_data)
+//   }
+// }
+
 object sync_mem extends App {
-  val verilogString = chisel3.getVerilogString(new Memory(1024,28))
+  val verilogString = chisel3.getVerilogString(new mem(128,10))
   val verilogFile = new File("sync_mem.sv")
   val writer = new PrintWriter(verilogFile)
   writer.write(verilogString)

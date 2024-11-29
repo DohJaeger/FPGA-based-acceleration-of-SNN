@@ -3,15 +3,18 @@ import chisel3.util._
 import java.io.File
 import java.io.PrintWriter
 
+//line 163 -> boundary if blk <= 9, col <3
 // tile depth: T
 // tile width: N
 class tile(T: Int, N: Int, mempot_width: Int) extends Module {
     val io = IO(new Bundle {
         
+        val stall = Input(Bool())
         // input aeq read
         val rd_en_aeq_i = Output(Bool())
         val rd_addr_aeq_i = Output(UInt(9.W))   //assumed input aeq depth = 256(8 bits)
         val rd_data_aeq_i = Input(UInt(11.W))     //aeq width = 9 bits
+        // val rd_data_aeq_i_valid = Input(Bool())
         
         // output aeq write (after thresholding)
         val wr_en_aeq_o = Output(Bool())
@@ -20,12 +23,13 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
 
         // main mempot rd/wr
         val wr_en_main_mempot = Output(Vec(9, Bool()))
-        val wr_addr_main_mempot = Output(Vec(9, UInt(8.W)))
+        val wr_addr_main_mempot = Output(Vec(9, UInt(9.W)))
         val wr_data_main_mempot = Output(Vec(9, UInt(9.W)))
 
         val rd_en_main_mempot = Output(Vec(9, Bool()))
-        val rd_addr_main_mempot = Output(Vec(9, UInt(8.W)))
+        val rd_addr_main_mempot = Output(Vec(9, UInt(9.W)))
         val rd_data_main_mempot = Input(Vec(9, UInt(9.W)))      //membrane pixel width 9 bits
+        // val rd_data_main_mempot_valid = Input(Bool())
 
         // boundary/local mempots
         // L1_N --> north boundary pixels in this tile
@@ -33,26 +37,30 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
         // L1_S --> south boundary pixels in this tile
         // L2_S --> south boundary pixels in the pther tile
         val wr_en_L2_N = Output(Vec(3, Bool()))     //3 parallel interlacing for now(as kernel: 3x3)
-        val wr_addr_L2_N = Output(Vec(3, UInt(8.W)))
+        val wr_addr_L2_N = Output(Vec(3, UInt(9.W)))
         val wr_data_L2_N = Output(Vec(3, UInt(9.W)))
         val rd_en_L2_N = Output(Vec(3, Bool()))     //3 parallel interlacing for now(as kernel: 3x3)
-        val rd_addr_L2_N = Output(Vec(3, UInt(8.W)))
+        val rd_addr_L2_N = Output(Vec(3, UInt(9.W)))
         val rd_data_L2_N = Input(Vec(3, UInt(9.W)))
+        // val rd_data_L2_N_valid = Input(Bool())
 
         val wr_en_L2_S = Output(Vec(3, Bool()))     //3 parallel interlacing for now(as kernel: 3x3)
-        val wr_addr_L2_S = Output(Vec(3, UInt(8.W)))
+        val wr_addr_L2_S = Output(Vec(3, UInt(9.W)))
         val wr_data_L2_S = Output(Vec(3, UInt(9.W)))
         val rd_en_L2_S = Output(Vec(3, Bool()))     //3 parallel interlacing for now(as kernel: 3x3)
-        val rd_addr_L2_S = Output(Vec(3, UInt(8.W)))
+        val rd_addr_L2_S = Output(Vec(3, UInt(9.W)))
         val rd_data_L2_S = Input(Vec(3, UInt(9.W)))
+        // val rd_data_L2_S_valid = Input(Bool())
 
         val rd_en_L1_N = Output(Bool())
-        val rd_addr_L1_N = Output(Vec(3, UInt(8.W)))
+        val rd_addr_L1_N = Output(Vec(3, UInt(9.W)))
         val rd_data_L1_N = Input(Vec(3, UInt(9.W)))     //membrane pixel width 9 bits
+        // val rd_data_L1_N_valid = Input(Bool())
 
         val rd_en_L1_S = Output(Bool())
-        val rd_addr_L1_S = Output(Vec(3, UInt(8.W)))
+        val rd_addr_L1_S = Output(Vec(3, UInt(9.W)))
         val rd_data_L1_S = Input(Vec(3, UInt(9.W)))     //membrane pixel width 9 bits
+        // val rd_data_L1_S_valid = Input(Bool())
 
         // network params
         val thresh_en = Input(Bool())
@@ -118,8 +126,8 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
     val s2_valid = RegInit(false.B)
     val s3_valid = RegInit(false.B)
     val s4_valid = RegInit(false.B)
-    val pipe_stall = Wire(Bool())
-    pipe_stall := false.B
+    val pipe_stall = io.stall
+    // pipe_stall := false.B
 
     val conv_done_reg = RegInit(false.B)
     val thresh_done_reg = RegInit(false.B)
@@ -143,9 +151,12 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
             val blk_in = spike_event(9,5)
             val col_in = spike_event(4,1)
             // val m = 3.U * (blk_in / tot_hor_blk) + (col_in % 3.U)
-            val m = 3.U * (blk_in / 9.U) + (col_in % 3.U)
+            // val m = 3.U * (blk_in / 9.U) + (col_in % 3.U)
             // val n = 3.U * (blk_in % tot_hor_blk) + (col_in / 3.U)
-            val n = 3.U * (blk_in % 9.U) + (col_in / 3.U)
+            // val n = 3.U * (blk_in % 9.U) + (col_in / 3.U)
+            val m = 3.U * (blk_in / tot_hor_blk.asUInt) + (col_in % 3.U)
+            val n = 3.U * (blk_in % tot_hor_blk.asUInt) + (col_in / 3.U)
+
 
             val i = RegInit(0.U)
             for(k <- 0 until 3){
@@ -343,7 +354,7 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
     }
         
     // stage - 2: add bias compare and 
-    when(s1_thresh_valid){
+    when(s1_thresh_valid && io.thresh_en){
         for(i <- 0 until 3){
             s2_thresh_bias_added(i) := s1_thresh_main_mem_rd(i) + s1_thresh_local_mem_rd(i) + io.bias(i)
 
@@ -357,7 +368,7 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
 
     // stage - 3: compare to threshold
     val s3_thresh_blk_counter = Reg(UInt(5.W))
-    when(s2_thresh_valid){
+    when(s2_thresh_valid && io.thresh_en){
         when(s3_thresh_blk_counter === 19.U){     // total 19 blks: tot_hor_blk * tot_ver_blk
             for(i <- 0 until 9){
                 when(s2_thresh_bias_added(i) >= io.v_t){
@@ -377,7 +388,7 @@ class tile(T: Int, N: Int, mempot_width: Int) extends Module {
 
     // stage - 4: update output aeq
     val s4_thresh_aeq_counter = Reg(UInt(5.W))
-    when(s3_thresh_valid){
+    when(s3_thresh_valid && io.thresh_en){
         io.wr_en_aeq_o := true.B
 
         for(i <- 0 until 9){
