@@ -1,16 +1,37 @@
 import chisel3._
 import chisel3.util._
 import chisel3.util.Decoupled
-import java.io.File
-import java.io.PrintWriter
-import java.io.{BufferedWriter, FileWriter}
+import java.io.{File, PrintWriter, BufferedWriter, FileWriter}
 
 import PE_IO_Defs._
 import PE_IO_Defs.NetworkUtils
 
-class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq_depth: Int, kernel_width: Int, num_interlac: Int, bias_width: Int) extends Module {
+class BoundaryCheck(dim_width: Int, aeq_width: Int) extends Module {
+  val io = IO(new Bundle {
+    val i = Input(UInt(((aeq_width - 2)/2).W))
+    val se_blk = Input(UInt(dim_width.W))
+    val se_col = Input(UInt(dim_width.W))
+    val se_col1 = Input(UInt(dim_width.W))
+    val col = Input(UInt(4.W))
+    val isNorth = Output(Bool())
+    val isSouth = Output(Bool())
+    val isNorth1 = Output(Bool())
+    val isSouth1 = Output(Bool())
+  })
+
+  val p1 = (col(2) & col(1)) | col(3)
+  val p0 = (~col(2) & col(1) & col(0)) | (col(2) & ~col(1))
+  val new_col = Cat(0.U(2.W), p1, p0)
+
+  io.isNorth := (io.i === 0.U)
+  io.isSouth := (io.i === io.se_blk) && (new_col === io.se_col)
+  io.isNorth1 := (io.i === 0.U)
+  io.isSouth1 := (io.i === io.se_blk) && (new_col === io.se_col1)
+}
+
+class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq_depth: Int, kernel_width: Int, num_interlac: Int, bias_width: Int, dim_width: Int) extends Module {
     val io = IO(new Bundle {
-        val pe_io = new PE_IO(num_col, aeq_depth, aeq_width, mempot_depth, mempot_width, bias_width, kernel_width)
+        val pe_io = new PE_IO(num_col, aeq_depth, aeq_width, mempot_depth, mempot_width, bias_width, kernel_width, dim_width)
     })
     
     NetworkUtils.initNetworkIO(io.pe_io, num_col)
@@ -21,9 +42,13 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
     val conv_done_reg = RegInit(false.B)
     val thresh_done_reg = RegInit(false.B)
 
+    val se_blk = (io.pe_io.T - 1.U) / 3   //south edge blk detect
+    val se_col = (io.pe_io.T - 1) % 3     //south edge col detect
+    val se_col1 = (io.pe_io.T - 2) % 3     //south edge col detect
+
     val local_mem_row_bits = log2Ceil(max_local_rows + 1)   // used in the addr calc
     val kernel_radius = (io.pe_io.kSize - 1.U) >> 1
-    
+    val num_blocks_per_spike = MuxLookup(io.pe_io.kSize, 0.U(5.W))(Seq( 3.U -> 1.U(5.W), 5.U -> 4.U(5.W), 7.U -> 9.U(5.W)))
 
     val pipe_stall = false.B
 
@@ -41,7 +66,7 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
 
     io.pe_io.aeq_portA_rdaddr.valid := !pipe_stall && !((aeq_read_col_sel_counter === 8.U) && eoq_bit)
     io.pe_io.aeq_portA_rdaddr.bits := aeq_read_addr
-    io.pe_io.aeq_portA_rddata.ready :=!pipe_stall && !((aeq_read_col_sel_counter === 8.U) && eoq_bit)
+    io.pe_io.aeq_portA_rddata.ready := !pipe_stall && !((aeq_read_col_sel_counter === 8.U) && eoq_bit)
 
     when(io.pe_io.aeq_portA_rdaddr.fire && io.pe_io.aeq_portA_rddata.fire) {
         spike_event := io.pe_io.aeq_portA_rddata.bits
@@ -60,14 +85,23 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
     }.otherwise {
         spike_valid := false.B
     }
+
     
     // --- stage - 0.5: calculate the reference addresses
     val i = (spike_event(aeq_width - 2, aeq_width/2)).asUInt
     val j = (spike_event(aeq_width/2 - 1, 1)).asUInt
     val Cs = aeq_col_select_counter
-
+    
     val Cs_s1 = RegNext(Cs)
+    
+    // check if spike occurs on the boundary
+    val isNorth = Wire(Bool())
+    val isSouth = Wire(Bool())
+    val (north, south) = Module(new BoundaryCheck(i, se_blk, se_col, se_col1, col, aeq_width, dim_width))
+    isNorth := north
+    isSouth := south
 
+    when()
     val ref_pixel = Wire(Vec(9, UInt((4 + aeq_width - 2).W)))  // sub-block col + i_new + j_new
     val ref_pixel_s1 = RegNext((ref_pixel))
 
@@ -77,13 +111,13 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
     val offset_7 = VecInit(Seq(
         VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 0
         VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 1
-        VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 2
+        VecInit((-1,  0), (-1, 1), (-1, 2), (0,  0), (0, 1), (0, 2), (1,  0), (1, 1), (1, 2)),  // 2
         VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 3
         VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 4
-        VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 5
-        VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 6
-        VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 7
-        VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 8
+        VecInit((-1,  0), (-1, 1), (-1, 2), (0,  0), (0, 1), (0, 2), (1,  0), (1, 1), (1, 2)),  // 5
+        VecInit(( 0, -1), ( 0, 0), ( 0, 1), (1, -1), (1, 0), (1, 1), (2, -1), (2, 0), (2, 1)),  // 6
+        VecInit(( 0, -1), ( 0, 0), ( 0, 1), (1, -1), (1, 0), (1, 1), (2, -1), (2, 0), (2, 1)),  // 7
+        VecInit(( 0,  0), ( 0, 1), ( 0, 2), (1,  0), (1, 1), (1, 2), (2,  0), (2, 1), (2, 2)),  // 8
     ))
 
     val offset_5 = VecInit(Seq(
@@ -95,7 +129,7 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
         VecInit(( 0,  0), ( 0, 1), (1,  0), (1, 1)),  // 5
         VecInit(( 1, -1), ( 0, 0), (1, -1), (1, 0)),  // 6
         VecInit(( 0,  0), ( 0, 1), (1,  0), (1, 1)),  // 7
-        VecInit(( 0,  0), ( 0, 1), (1,  0),  (1, 1))  // 8
+        VecInit(( 0,  0), ( 0, 1), (1,  0), (1, 1))   // 8
     ))
 
     val ref_pixel_5x5 = Wire(Vec(4, UInt((3 + aeq_width/2).W)))
@@ -130,16 +164,10 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
     
 
     // --- stage - 1: calculate the neighbor address ---
+    val s1_valid = Wire(Bool())
     val ref_pixel_s2 = Wire(Vec(9, UInt((3 + aeq_width / 2).W)))
 
-    val block_counter = RegInit(0.U(6.W))
-
-    val num_blocks_per_spike = MuxLookup(io.pe_io.kSize, 0.U(6.W))(
-    Seq( 3.U -> 1.U(5.W),
-        5.U -> 4.U(5.W),
-        7.U -> 9.U(5.W)
-    )
-    )
+    val block_counter = RegInit(0.U(log2Ceil(num_blocks_per_spike).W))
 
     val compute_sub_block = Wire(Bool())
 
@@ -151,6 +179,8 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
 
     compute_sub_block := (block_counter < num_blocks_per_spike)
 
+
+    // neighbour pixels' address calc
     val new_i = Wire(UInt((aeq_width/2 - 1).W))
     val new_j = Wire(UInt((aeq_width/2 - 1).W))
     val input_idx = Wire(UInt(4.W))
@@ -165,48 +195,9 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
         i_in := spike_event_s1(aeq_width - 2, aeq_width/2)
         j_in := ref_pixel_s1(aeq_width - 3, 1)
     }
-    
-    val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
-    switch(input_idx) {
-        is(0.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
-                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
-                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0)) }
-
-        is(1.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
-                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
-                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2)) }
-
-        is(2.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
-                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
-                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1)) }
-
-        is(3.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
-                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
-                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6)) }
-
-        is(4.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
-                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
-                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8)) }
-
-        is(5.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
-                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
-                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7)) }
-
-        is(6.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
-                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
-                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3)) }
-
-        is(7.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
-                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
-                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5)) }
-
-        is(8.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
-                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
-                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4)) }
-    }
 
 
-    when(compute_sub_block) {
+    when(compute_sub_block && !pipe_stall) {
         for (col <- 0 until 9) {
             new_i := i_in
             new_j := j_in
@@ -235,11 +226,13 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
 
             ref_pixel_s2(col) := Cat(col.U(4.W), new_i, new_j)
         }
+        s1_valid := true.B
     }
 
 
     // stage - 2: mempot read
     val s2_mempot_rd = Reg(Vec(9, UInt(mempot_width.W)))
+    val s2_valid = Wire(Bool())
 
     when(s1_valid && !pipe_stall && io.pe_io.conv_en) {
         for (i <- 0 until num_interlac) {
@@ -282,14 +275,17 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
                 s2_mempot_rd(i) := 0.U
             }
         }
+        s2_valid := true.B
     }.otherwise {
         for (i <- 0 until num_interlac) {
             s2_mempot_rd(i) := 0.U
         }
+        s2_valid := false.B
     }
 
     // stage - 3: convolution
     val s3_conv = Reg(Vec(num_col, UInt(mempot_width.W)))
+    val s3_valid = Wire(Bool())
 
     when(s2_valid && io.pe_io.conv_en) {
         for (i <- 0 until 9) {
@@ -480,8 +476,8 @@ class pe_nxn(kernel5: Bool, kernel7: Bool, max_local_rows: Int, T: Int, N: Int, 
 }
 
 object pe_nxn extends App {
-  val verilogString = chisel3.getVerilogString(new pe_nxn(T = 16, N = 16,num_col = 9, mempot_width = 16, mempot_depth = 256, aeq_width = 12, aeq_depth = 256, kernel_width = 8, num_interlac = 9, bias_width = 8))
-  val verilogFile = new File("pe_nxn.sv")
+  val verilogString = chisel3.getVerilogString(new pe(kernel5 = true, kernel7 = true, max_local_rows = 3, num_col = 9, mempot_width = 16, mempot_depth = 256, aeq_width = 12, aeq_depth = 256, kernel_width = 8, num_interlac = 9, bias_width = 8))
+  val verilogFile = new File("pe.sv")
   val writer = new PrintWriter(verilogFile)
   writer.write(verilogString)
   writer.close()

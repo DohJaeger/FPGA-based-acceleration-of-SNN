@@ -14,7 +14,7 @@ import chisel3.util.Decoupled
     L2_S --> south boundary pixels in the other tile
 */
 
-class PE_IO(num_col: Int, aeq_depth: Int, aeq_width: Int, mempot_depth: Int, mempot_width: Int, bias_width: Int, kernel_width: Int) extends Bundle {
+class PE_IO(num_col: Int, aeq_depth: Int, aeq_width: Int, mempot_depth: Int, mempot_width: Int, bias_width: Int, kernel_width: Int, dim_width: Int) extends Bundle {
 
     // Main Memory BRAM Port A -> Read from BRAM
     val main_mempot_portA_rdaddr = Vec(num_col, Decoupled(UInt(log2Ceil(mempot_depth).W)))
@@ -64,6 +64,8 @@ class PE_IO(num_col: Int, aeq_depth: Int, aeq_width: Int, mempot_depth: Int, mem
     val v_t = Input(UInt(mempot_width.W))
     val rotated_kernel = Input(Vec(num_col, UInt(kernel_width.W)))
     val kSize = Input(UInt(kernel_width.W))
+    val T = Input(UInt(dim_width.W))
+    val N = Input(UInt(dim_width.W))
 
     // Output Flags
     val conv_done = Output(Bool())
