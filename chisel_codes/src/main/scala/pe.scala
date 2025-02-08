@@ -97,11 +97,10 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     // check if spike occurs on the boundary
     val isNorth = Wire(Bool())
     val isSouth = Wire(Bool())
-    val (north, south) = Module(new BoundaryCheck(i, se_blk, se_col, se_col1, col, aeq_width, dim_width))
-    isNorth := north
-    isSouth := south
+    val boundaryCheck = Module(new BoundaryCheck(i, se_blk, se_col, se_col1, col, aeq_width, dim_width))
+    val isNorth = boundaryCheck.io.north
+    val isSouth = boundaryCheck.io.south
 
-    when()
     val ref_pixel = Wire(Vec(9, UInt((4 + aeq_width - 2).W)))  // sub-block col + i_new + j_new
     val ref_pixel_s1 = RegNext((ref_pixel))
 
@@ -161,7 +160,6 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     }.elsewhen(io.PE_IO.kSize === 7.U) {
         ref_pixel := ref_pixel_7x7
     }
-    
 
     // --- stage - 1: calculate the neighbor address ---
     val s1_valid = Wire(Bool())
@@ -197,6 +195,9 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     }
 
 
+    val boundaryCheck_s1 = Module(new BoundaryCheck(new_i, se_blk, se_col, se_col1, col, aeq_width, dim_width))
+    val flagReg = RegInit(VecInit(Seq.fill(9)(0.U(3.W))))
+
     when(compute_sub_block && !pipe_stall) {
         for (col <- 0 until 9) {
             new_i := i_in
@@ -224,11 +225,52 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
                 }
             }
 
+            flagReg(col)(2) := boundaryCheck_s1.io.isNorth || boundaryCheck_s1.io.isSouth
+            flagReg(col)(1) := boundaryCheck_s1.io.isNorth
+            flagReg(col)(0) := 1.U
             ref_pixel_s2(col) := Cat(col.U(4.W), new_i, new_j)
         }
         s1_valid := true.B
     }
 
+val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
+    switch(input_idx) {
+        is(0.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
+                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
+                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0)) }
+
+        is(1.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
+                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
+                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2)) }
+
+        is(2.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
+                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
+                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1)) }
+
+        is(3.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
+                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
+                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6)) }
+
+        is(4.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
+                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
+                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8)) }
+
+        is(5.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
+                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
+                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7)) }
+
+        is(6.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
+                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
+                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3)) }
+
+        is(7.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
+                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
+                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5)) }
+
+        is(8.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
+                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
+                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4)) }
+    }
 
     // stage - 2: mempot read
     val s2_mempot_rd = Reg(Vec(9, UInt(mempot_width.W)))
@@ -236,12 +278,10 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
 
     when(s1_valid && !pipe_stall && io.pe_io.conv_en) {
         for (i <- 0 until num_interlac) {
-            val addr_flags = s1_addr_calc_stage2(i)(2 + local_mem_row_bits, 0)
-            val local_flag = addr_flags(2)
-            val north_flag = addr_flags(1)
-            val valid_flag = addr_flags(0)
-            val row_idx = addr_flags(local_mem_row_bits - 1, 0)
-            val col_idx = s1_addr_calc_stage2(i)(blk_bit_width + log2Ceil(num_interlac) - 1, blk_bit_width)
+            val local_flag = flagReg(2)
+            val north_flag = flagReg(1)
+            val valid_flag = flagReg(0)
+            val col_idx = ref_pixel_s2(aeq_width + 3, aeq_width)
 
             when(valid_flag === 1.U) {
                 when(local_flag === 1.U) { // Local memory
@@ -379,7 +419,7 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     }
 
     // --- thresholding pipeline stages ---
-    val tot_blk = tot_hor_blk * tot_ver_blk
+    val tot_blk = ((io.pe_io.T - 1)/3) * ((io.pe_io.N - 1)/3)
     
     val s1_main_mempot = Reg(Vec(9, UInt(mempot_width.W)))
     val s1_local_mempot = Reg(Vec(9, UInt(mempot_width.W)))
