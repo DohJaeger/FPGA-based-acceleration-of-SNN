@@ -277,11 +277,11 @@ val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
     val s2_valid = Wire(Bool())
 
     when(s1_valid && !pipe_stall && io.pe_io.conv_en) {
-        for (i <- 0 until num_interlac) {
-            val local_flag = flagReg(2)
-            val north_flag = flagReg(1)
-            val valid_flag = flagReg(0)
-            val col_idx = ref_pixel_s2(aeq_width + 3, aeq_width)
+        for (i <- 0 until 9) {
+            val local_flag = flagReg(i)(2)
+            val north_flag = flagReg(i)(1)
+            val valid_flag = flagReg(i)(0)
+            val col_idx = ref_pixel_s2(i)(aeq_width + 3, aeq_width)
 
             when(valid_flag === 1.U) {
                 when(local_flag === 1.U) { // Local memory
