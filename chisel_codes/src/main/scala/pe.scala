@@ -204,6 +204,7 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
         }
     }
 
+    
     when(io.PE_IO.kSize === 5.U) {
         ref_pixel := ref_pixel_5x5 ++ VecInit(Seq.fill(5)(0.U((3 + aeq_width / 2).W)))
     }.elsewhen(io.PE_IO.kSize === 7.U) {
