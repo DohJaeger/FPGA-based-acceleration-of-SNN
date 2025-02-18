@@ -42,7 +42,8 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     val conv_done_reg = RegInit(false.B)
     val thresh_done_reg = RegInit(false.B)
 
-    val se_blk = (io.pe_io.T - 1.U) / 3   //south edge blk detect
+    val tot_hor_blk = (io.pe_io.N - 1)/3
+    val se_blk = (io.pe_io.T - 1) / 3   //south edge blk detect
     val se_col = (io.pe_io.T - 1) % 3     //south edge col detect
     val se_col1 = (io.pe_io.T - 2) % 3     //south edge col detect
 
@@ -88,24 +89,50 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
 
     
     // --- stage - 0.5: calculate the reference addresses
-    val i = (spike_event(aeq_width - 2, aeq_width/2)).asUInt
-    val j = (spike_event(aeq_width/2 - 1, 1)).asUInt
+    val i = (spike_event(aeq_width - 2, aeq_width / 2)).asUInt
+    val j = (spike_event(aeq_width / 2 - 1, 1)).asUInt
     val Cs = aeq_col_select_counter
-    
+
     val Cs_s1 = RegNext(Cs)
-    
-    // check if spike occurs on the boundary
-    val isNorth = Wire(Bool())
-    val isSouth = Wire(Bool())
+
     val boundaryCheck = Module(new BoundaryCheck(i, se_blk, se_col, se_col1, col, aeq_width, dim_width))
     val isNorth = boundaryCheck.io.north
     val isSouth = boundaryCheck.io.south
+    val isNorth1 = boundaryCheck.io.north1
+    val isSouth1 = boundaryCheck.io.south1
+    val isNorth2 = boundaryCheck.io.north2
+    val isSouth2 = boundaryCheck.io.south2
 
-    val ref_pixel = Wire(Vec(9, UInt((4 + aeq_width - 2).W)))  // sub-block col + i_new + j_new
-    val ref_pixel_s1 = RegNext((ref_pixel))
+    val ref_pixel = Wire(Vec(9, UInt((4 + aeq_width - 2).W))) // col + i_new + j_new
+    val ref_pixel_s1 = RegNext(ref_pixel)
 
-    val col_map_7 = VecInit(4.U, 5.U, 3.U, 7.U, 8.U, 6.U, 1.U, 2.U, 0.U)
-    val col_map_5 = VecInit(8.U, 6.U, 7.U, 2.U, 0.U, 1.U, 5.U, 3.U, 4.U)
+    val col_map_7 = VecInit(Seq(
+        VecInit(4.U, 3.U, 5.U, 1.U, 0.U, 2.U, 7.U, 6.U, 8.U),
+        VecInit(5.U, 4.U, 3.U, 2.U, 1.U, 0.U, 8.U, 7.U, 6.U),
+        VecInit(3.U, 5.U, 4.U, 0.U, 2.U, 1.U, 6.U, 8.U, 7.U),
+
+        VecInit(7.U, 6.U, 8.U, 4.U, 3.U, 5.U, 1.U, 0.U, 2.U),
+        VecInit(8.U, 7.U, 6.U, 5.U, 4.U, 3.U, 2.U, 1.U, 0.U),
+        VecInit(6.U, 8.U, 7.U, 3.U, 5.U, 4.U, 0.U, 2.U, 1.U),
+
+        VecInit(1.U, 0.U, 2.U, 7.U, 6.U, 8.U, 4.U, 3.U, 5.U),
+        VecInit(2.U, 1.U, 0.U, 8.U, 7.U, 6.U, 5.U, 4.U, 3.U),
+        VecInit(0.U, 2.U, 1.U, 6.U, 8.U, 7.U, 3.U, 5.U, 4.U)
+    ))
+
+    val col_map_5 = VecInit(Seq(
+        VecInit(8.U, 7.U, 5.U, 4.U),    // 0
+        VecInit(6.U, 8.U, 3.U, 5.U),    // 1
+        VecInit(7.U, 6.U, 4.U, 3.U),    // 2
+
+        VecInit(2.U, 1.U, 8.U, 7.U),    // 3
+        VecInit(0.U, 2.U, 6.U, 8.U),    // 4
+        VecInit(1.U, 0.U, 7.U, 6.U),    // 5
+
+        VecInit(5.U, 4.U, 2.U, 1.U),    // 6
+        VecInit(3.U, 5.U, 0.U, 2.U),    // 7
+        VecInit(4.U, 3.U, 1.U, 0.U)     // 8
+    ))
 
     val offset_7 = VecInit(Seq(
         VecInit((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 0), (0, 1), (1, -1), (1, 0), (1, 1)),  // 0
@@ -116,7 +143,7 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
         VecInit((-1,  0), (-1, 1), (-1, 2), (0,  0), (0, 1), (0, 2), (1,  0), (1, 1), (1, 2)),  // 5
         VecInit(( 0, -1), ( 0, 0), ( 0, 1), (1, -1), (1, 0), (1, 1), (2, -1), (2, 0), (2, 1)),  // 6
         VecInit(( 0, -1), ( 0, 0), ( 0, 1), (1, -1), (1, 0), (1, 1), (2, -1), (2, 0), (2, 1)),  // 7
-        VecInit(( 0,  0), ( 0, 1), ( 0, 2), (1,  0), (1, 1), (1, 2), (2,  0), (2, 1), (2, 2)),  // 8
+        VecInit(( 0,  0), ( 0, 1), ( 0, 2), (1,  0), (1, 1), (1, 2), (2,  0), (2, 1), (2, 2))   // 8
     ))
 
     val offset_5 = VecInit(Seq(
@@ -131,41 +158,64 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
         VecInit(( 0,  0), ( 0, 1), (1,  0), (1, 1))   // 8
     ))
 
-    val ref_pixel_5x5 = Wire(Vec(4, UInt((3 + aeq_width/2).W)))
+    // 5x5 spike locations
+    val ref_pixel_5x5 = Wire(Vec(4, UInt((3 + aeq_width / 2).W)))
+    val isLocal5 = Wire(Vec(4, Bool()))
+    val isLocal5_s1 = RegNext(isLocal5)
+    val isMain5 = Wire(Vec(4, Bool()))
+    val isMain5_s1 = RegNext(isMain5)
+    val isEdge5 = Wire(Vec(4, Bool()))
+    val isEdge5_s1 = RegNext(isEdge5)
+
     when(kernel5.B) {
         for (idx <- 0 until 4) {
             val (off_i, off_j) = offset_5(Cs)(idx)
-            ref_pixel_5x5(idx) := Cat(
-                col_map_5(Cs),
-                (i.asSInt + off_i.S).asUInt,
-                (j.asSInt + off_j.S).asUInt
-            )
+            val i_new = (i.asSInt + off_i.S).asUInt
+            val j_new = (j.asSInt + off_j.S).asUInt
+
+            ref_pixel_5x5(idx) := Cat(col_map_5(Cs), i_new, j_new)
+
+            isEdge5(idx) := (isNorth && off_i === -1.S) || (isSouth && off_i === 1.S)
+            isLocal5(idx) := !isEdge5(idx) && (isNorth1 || isSouth1)
+            isMain5(idx) := !isLocal5(idx)
         }
     }
 
-    val ref_pixel_7x7 = Wire(Vec(9, UInt((3 + aeq_width/2).W)))
+    // 7x7 spike locations
+    val ref_pixel_7x7 = Wire(Vec(9, UInt((3 + aeq_width / 2).W)))
+    val isLocal7 = Wire(Vec(9, Bool()))
+    val isLocal7_s1 = RegNext(isLocal7)
+    val isMain7 = Wire(Vec(9, Bool()))
+    val isMain7_s1 = RegNext(isMain7)
+    val isEdge7 = Wire(Vec(9, Bool()))
+    val isEdge7_s1 = RegNext(isEdge7)
+
     when(kernel7.B) {
         for (idx <- 0 until 9) {
             val (off_i, off_j) = offset_7(Cs)(idx)
-            ref_pixel_7x7(idx) := Cat(
-                col_map_7(Cs),
-                (i.asSInt + off_i.S).asUInt,
-                (j.asSInt + off_j.S).asUInt
-            )
+            val i_new = (i.asSInt + off_i.S).asUInt
+            val j_new = (j.asSInt + off_j.S).asUInt
+
+            ref_pixel_7x7(idx) := Cat(col_map_7(Cs), i_new, j_new)
+
+            isEdge7(idx) := (isNorth2 && off_i === -2.S) || (isSouth2 && off_i === 2.S)
+            isLocal7(idx) := (isNorth1 || isSouth1) && !isEdge7(idx) // Within local memory
+            isMain7(idx) := !isLocal7(idx) // Otherwise, in main memory
         }
     }
 
     when(io.PE_IO.kSize === 5.U) {
-        ref_pixel := ref_pixel_5x5 ++ VecInit(Seq.fill(5)(0.U((3 + aeq_width/2).W)))
+        ref_pixel := ref_pixel_5x5 ++ VecInit(Seq.fill(5)(0.U((3 + aeq_width / 2).W)))
     }.elsewhen(io.PE_IO.kSize === 7.U) {
         ref_pixel := ref_pixel_7x7
     }
 
     // --- stage - 1: calculate the neighbor address ---
     val s1_valid = Wire(Bool())
-    val ref_pixel_s2 = Wire(Vec(9, UInt((3 + aeq_width / 2).W)))
+    val ref_pixel_s2 = Wire(Vec(9, UInt((aeq_width - 2).W)))
 
     val block_counter = RegInit(0.U(log2Ceil(num_blocks_per_spike).W))
+    val block_counter_s2 = RegNext(block_counter)
 
     val compute_sub_block = Wire(Bool())
 
@@ -177,11 +227,11 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
 
     compute_sub_block := (block_counter < num_blocks_per_spike)
 
-
     // neighbour pixels' address calc
     val new_i = Wire(UInt((aeq_width/2 - 1).W))
     val new_j = Wire(UInt((aeq_width/2 - 1).W))
     val input_idx = Wire(UInt(4.W))
+    val input_idx_s2 = RegNext(input_idx)
 
     val totalW_ref_pix = ref_pixel_s1(block_counter).getWidth
     when(io.PE_IO.kSize === 5.U || io.PE_IO.kSize === 7.U){
@@ -228,49 +278,158 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
             flagReg(col)(2) := boundaryCheck_s1.io.isNorth || boundaryCheck_s1.io.isSouth
             flagReg(col)(1) := boundaryCheck_s1.io.isNorth
             flagReg(col)(0) := 1.U
-            ref_pixel_s2(col) := Cat(col.U(4.W), new_i, new_j)
+            ref_pixel_s2(col) := Cat(new_i, new_j)
         }
         s1_valid := true.B
     }
 
-val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
-    switch(input_idx) {
-        is(0.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
-                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
-                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0)) }
+    val validity_map5 = VecInit(Seq(
+        // Validity map for blk1
+        VecInit(Seq(
+            VecInit(true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B), 
+            VecInit(true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B),  
+            VecInit(false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B), 
+    
+            VecInit(true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B),  
+            VecInit(true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B),     
+            VecInit(false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B),  
+    
+            VecInit(true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B),
+            VecInit(true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B), 
+            VecInit(false.B, true.B, true.B, false.B, true.B, true.B, false.B, true.B, true.B) 
+        )),
+        
+        // Validity map for blk2
+        VecInit(Seq(
+            VecInit(true.B, true.B, true.B, true.B, true.B, true.B, false.B, false.B, false.B), 
+            VecInit(true.B, true.B, true.B, true.B, true.B, true.B, false.B, false.B, false.B),  
+            VecInit(true.B, true.B, true.B, true.B, true.B, true.B, false.B, false.B, false.B),  
+    
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, true.B, true.B, true.B), 
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, true.B, true.B, true.B),     
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, true.B, true.B, true.B),    
+    
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, true.B, true.B, true.B),  
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, true.B, true.B, true.B),   
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, true.B, true.B, true.B)  
+        )),
+        
+        // Validity map for blk3
+        VecInit(Seq(
+            VecInit(true.B, true.B, false.B, true.B, true.B, false.B, false.B, false.B, false.B), 
+            VecInit(false.B, true.B, true.B, false.B, true.B, true.B, false.B, false.B, false.B),  
+            VecInit(true.B, false.B, true.B, true.B, false.B, true.B, false.B, false.B, false.B), 
+    
+            VecInit(false.B, false.B, false.B, true.B, true.B, false.B, true.B, true.B, false.B),  
+            VecInit(false.B, false.B, false.B, false.B, true.B, true.B, false.B, true.B, true.B), 
+            VecInit(false.B, false.B, false.B, true.B, false.B, true.B, true.B, false.B, true.B), 
+                 
+            VecInit(true.B, true.B, false.B, false.B, false.B, false.B, true.B, true.B, false.B), 
+            VecInit(false.B, true.B, true.B, false.B, false.B, false.B, false.B, true.B, true.B), 
+            VecInit(true.B, false.B, true.B, false.B, false.B, false.B, true.B, false.B, true.B)  
+        ))
+    ))
 
-        is(1.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
-                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
-                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2)) }
+    val validity_map7 = VecInit(Seq(
+        // Validity map for blk1
+        VecInit(Seq(
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 0
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 1
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 2
 
-        is(2.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
-                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
-                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1)) }
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 3
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 4
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 5
 
-        is(3.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
-                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3),
-                                        io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6)) }
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 6
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 7
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 8
+        )),
+        
+        // Validity map for blk3
+        VecInit(Seq(
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B), 
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B),  
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B), 
 
-        is(4.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
-                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5),
-                                        io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8)) }
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B), 
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B),  
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B),
 
-        is(5.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
-                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4),
-                                        io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7)) }
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B),  
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B),
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B)
+        )),
+        
+        // Validity map for blk5
+        VecInit(Seq(
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B), 
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B),  
+            VecInit(true.B, true.B, true.B, false.B, false.B, false.B, false.B, false.B, false.B), 
 
-        is(6.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6),
-                                        io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0),
-                                        io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3)) }
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B), 
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B),  
+            VecInit(false.B, false.B, false.B, true.B, true.B, true.B, false.B, false.B, false.B),
 
-        is(7.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7), io.PE_IO.rotated_kernel(8),
-                                        io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1), io.PE_IO.rotated_kernel(2),
-                                        io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4), io.PE_IO.rotated_kernel(5)) }
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B),  
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B),
+            VecInit(false.B, false.B, false.B, false.B, false.B, false.B, true.B, true.B, true.B)
+        )),
+        
+        // Validity map for blk7
+        VecInit(Seq(
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 0
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 1
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 2
 
-        is(8.U) { kernel_s2 := VecInit( io.PE_IO.rotated_kernel(8), io.PE_IO.rotated_kernel(6), io.PE_IO.rotated_kernel(7),
-                                        io.PE_IO.rotated_kernel(2), io.PE_IO.rotated_kernel(0), io.PE_IO.rotated_kernel(1),
-                                        io.PE_IO.rotated_kernel(5), io.PE_IO.rotated_kernel(3), io.PE_IO.rotated_kernel(4)) }
-    }
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 3
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 4
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 5
+
+            VecInit(true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B),  // 6
+            VecInit(false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B, false.B),  // 7
+            VecInit(false.B, false.B, true.B, false.B, false.B, true.B, false.B, false.B, true.B)   // 8
+        ))
+    ))
+
+    val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
+        switch(input_idx) {
+            is(0.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3),
+                                            io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6),
+                                            io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0)) }
+
+            is(1.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5),
+                                            io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8),
+                                            io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2)) }
+
+            is(2.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4),
+                                            io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7),
+                                            io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1)) }
+
+            is(3.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0),
+                                            io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3),
+                                            io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6)) }
+
+            is(4.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2),
+                                            io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5),
+                                            io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8)) }
+
+            is(5.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1),
+                                            io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4),
+                                            io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7)) }
+
+            is(6.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6),
+                                            io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0),
+                                            io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3)) }
+
+            is(7.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8),
+                                            io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2),
+                                            io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5)) }
+
+            is(8.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7),
+                                            io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1),
+                                            io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4)) }
+        }
 
     // stage - 2: mempot read
     val s2_mempot_rd = Reg(Vec(9, UInt(mempot_width.W)))
@@ -281,34 +440,93 @@ val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
             val local_flag = flagReg(i)(2)
             val north_flag = flagReg(i)(1)
             val valid_flag = flagReg(i)(0)
-            val col_idx = ref_pixel_s2(i)(aeq_width + 3, aeq_width)
+            val s_i = ref_pixel_s2(i)(aeq_width - 3, aeq_width/2 - 1)
+            val s_j = ref_pixel_s2(i)(aeq_width/2 - 2, 0)
 
             when(valid_flag === 1.U) {
-                when(local_flag === 1.U) { // Local memory
-                    when(north_flag === 1.U) { // Local North Memory
-                        io.pe_io.L2_N_portA_rdaddr(col_idx).valid := true.B
-                        io.pe_io.L2_N_portA_rdaddr(col_idx).bits := row_idx
-                        when(io.pe_io.L2_N_portA_rddata(col_idx).valid) {
-                            s2_mempot_rd(i) := io.pe_io.L2_N_portA_rddata(col_idx).bits
-                        }.otherwise {
-                            s2_mempot_rd(i) := 0.U
+                when(io.pe_io.kSize === 5.U){
+                    when(local_flag === 1.U) { // Local memory
+                        when(north_flag === 1.U) { // Local North Memory
+                            io.pe_io.L2_N_portA_rdaddr(i).valid := validity_map5(block_counter_s2)(i)
+                            io.pe_io.L2_N_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_N_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_N_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
+                        }.otherwise { // Local South Memory
+                            io.pe_io.L2_S_portA_rdaddr(i).valid := validity_map5(block_counter_s2)(i)
+                            io.pe_io.L2_S_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_S_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_S_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
                         }
-                    }.otherwise { // Local South Memory
-                        io.pe_io.L2_S_portA_rdaddr(col_idx).valid := true.B
-                        io.pe_io.L2_S_portA_rdaddr(col_idx).bits := row_idx
-                        when(io.pe_io.L2_S_portA_rddata(col_idx).valid) {
-                            s2_mempot_rd(i) := io.pe_io.L2_S_portA_rddata(col_idx).bits
+                    }.otherwise { // Main memory
+                        io.pe_io.main_mempot_portA_rdaddr(i).valid := validity_map5(block_counter_s2)(i)
+                        io.pe_io.main_mempot_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                        when(io.pe_io.main_mempot_portA_rddata(i).valid) {
+                            s2_mempot_rd(i) := io.pe_io.main_mempot_portA_rddata(col_idx).bits
                         }.otherwise {
                             s2_mempot_rd(i) := 0.U
                         }
                     }
-                }.otherwise { // Main memory
-                    io.pe_io.main_mempot_portA_rdaddr(col_idx).valid := true.B
-                    io.pe_io.main_mempot_portA_rdaddr(col_idx).bits := row_idx
-                    when(io.pe_io.main_mempot_portA_rddata(col_idx).valid) {
-                        s2_mempot_rd(i) := io.pe_io.main_mempot_portA_rddata(col_idx).bits
-                    }.otherwise {
-                        s2_mempot_rd(i) := 0.U
+                }.elsewhen(io.pe_io.kSize === 7.U){
+                    when(local_flag === 1.U) { // Local memory
+                        when(north_flag === 1.U) { // Local North Memory
+                            io.pe_io.L2_N_portA_rdaddr(i).valid := validity_map7(block_counter_s2)(i)
+                            io.pe_io.L2_N_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_N_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_N_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
+                        }.otherwise { // Local South Memory
+                            io.pe_io.L2_S_portA_rdaddr(i).valid := validity_map7(block_counter_s2)(i)
+                            io.pe_io.L2_S_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_S_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_S_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
+                        }
+                    }.otherwise { // Main memory
+                        io.pe_io.main_mempot_portA_rdaddr(i).valid := validity_map7(block_counter_s2)(i)
+                        io.pe_io.main_mempot_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                        when(io.pe_io.main_mempot_portA_rddata(i).valid) {
+                            s2_mempot_rd(i) := io.pe_io.main_mempot_portA_rddata(col_idx).bits
+                        }.otherwise {
+                            s2_mempot_rd(i) := 0.U
+                        }
+                    }
+                }.otherwise{
+                    when(local_flag === 1.U) { // Local memory
+                        when(north_flag === 1.U) { // Local North Memory
+                            io.pe_io.L2_N_portA_rdaddr(i).valid := true.B
+                            io.pe_io.L2_N_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_N_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_N_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
+                        }.otherwise { // Local South Memory
+                            io.pe_io.L2_S_portA_rdaddr(i).valid := true.B
+                            io.pe_io.L2_S_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                            when(io.pe_io.L2_S_portA_rddata(i).valid) {
+                                s2_mempot_rd(i) := io.pe_io.L2_S_portA_rddata(col_idx).bits
+                            }.otherwise {
+                                s2_mempot_rd(i) := 0.U
+                            }
+                        }
+                    }.otherwise { // Main memory
+                        io.pe_io.main_mempot_portA_rdaddr(i).valid := true.B
+                        io.pe_io.main_mempot_portA_rdaddr(i).bits := s_i * tot_hor_blk + s_j
+                        when(io.pe_io.main_mempot_portA_rddata(i).valid) {
+                            s2_mempot_rd(i) := io.pe_io.main_mempot_portA_rddata(col_idx).bits
+                        }.otherwise {
+                            s2_mempot_rd(i) := 0.U
+                        }
                     }
                 }
             }.otherwise { // Invalid address
@@ -329,7 +547,7 @@ val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
 
     when(s2_valid && io.pe_io.conv_en) {
         for (i <- 0 until 9) {
-            s3_conv(i) := s2_mempot_rd(i) + io.pe_io.rotated_kernel(i)
+            s3_conv(i) := s2_mempot_rd(i) + kernel_s2(i)
         }
         s3_valid := true.B
     }
