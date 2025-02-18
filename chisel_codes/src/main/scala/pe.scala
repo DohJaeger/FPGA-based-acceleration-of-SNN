@@ -283,6 +283,8 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
         s1_valid := true.B
     }
 
+    
+    // stage - 2: mempot read
     val validity_map5 = VecInit(Seq(
         // Validity map for blk1
         VecInit(Seq(
@@ -393,7 +395,7 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
     ))
 
     val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
-        switch(input_idx) {
+        switch(input_idx_s2) {
             is(0.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3),
                                             io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6),
                                             io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0)) }
@@ -430,8 +432,6 @@ class pe(kernel5: Bool, kernel7: Bool, max_local_rows: Int, num_col: Int, mempot
                                             io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0), io.pe_io.rotated_kernel(1),
                                             io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4)) }
         }
-
-    // stage - 2: mempot read
     val s2_mempot_rd = Reg(Vec(9, UInt(mempot_width.W)))
     val s2_valid = Wire(Bool())
 
