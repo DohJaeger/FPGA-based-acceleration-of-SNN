@@ -178,9 +178,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
 
     switch(input_idx_s2) {
-        is(0.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5), io.pe_io.rotated_kernel(3),
-                                        io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8), io.pe_io.rotated_kernel(6),
-                                        io.pe_io.rotated_kernel(1), io.pe_io.rotated_kernel(2), io.pe_io.rotated_kernel(0)) }
+        is(0.U) { kernel_s2 := io.pe_io.findBetterName }
 
         is(1.U) { kernel_s2 := VecInit( io.pe_io.rotated_kernel(3), io.pe_io.rotated_kernel(4), io.pe_io.rotated_kernel(5),
                                         io.pe_io.rotated_kernel(6), io.pe_io.rotated_kernel(7), io.pe_io.rotated_kernel(8),

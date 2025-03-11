@@ -61,6 +61,25 @@ class PE_IO(num_col: Int, aeq_depth: Int, aeq_width: Int, mempot_depth: Int, mem
     val bias = Input(UInt(mempot_width.W))
     val v_t = Input(UInt(mempot_width.W))
     val rotated_kernel = Input(Vec(num_col, UInt(kernel_width.W)))
+
+    // IDEA1 define functions that return the correct ordering of the kernel entries like the one below
+    // (you need to use a better name that actually correctly describes what this represents, of course)
+    // then use them from the cu.scala file
+    val findBetterName = VecInit(   rotated_kernel(4), rotated_kernel(5), rotated_kernel(3),
+                                    rotated_kernel(7), rotated_kernel(8), rotated_kernel(6),
+                                    rotated_kernel(1), rotated_kernel(2), rotated_kernel(0))
+
+    // IDEA2 you can actually put the kernel selection logic into this class. When doing so, still
+    // give prober names to the things you return.
+    def getKernel(idx: UInt) : Vec[UInt] = {
+        val result = VecInit(0.U, 0.U, 0.U, 0.U, 0.U, 0.U, 0.U, 0.U, 0.U)
+        switch(idx) {
+            is(0.U) { result := findBetterName }
+            // implement the other cases as well
+        }
+       return result
+    }
+
     val kSize = Input(UInt(kernel_width.W))
     val T = Input(UInt(dim_width.W))
     val N = Input(UInt(dim_width.W))
