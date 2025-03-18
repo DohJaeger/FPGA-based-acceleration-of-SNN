@@ -1,13 +1,13 @@
-module TrueDualPortBRAM #(
+module tdpb #(
     parameter DATA_WIDTH = 16,
     parameter ADDR_WIDTH = 10
 )(
     input                        clka, clkb,
     input                        ena, enb,
     input                        wea, web,
-    input      [ADDR_WIDTH-1:0]   addra, addrb,
-    input      [DATA_WIDTH-1:0]   dia, dib,
-    output reg [DATA_WIDTH-1:0]   doa, dob
+    input      [ADDR_WIDTH-1:0]  addra, addrb,
+    input      [DATA_WIDTH-1:0]  dia, dib,
+    output reg [DATA_WIDTH-1:0]  doa, dob
 );
 
     reg [DATA_WIDTH-1:0] ram [(2**ADDR_WIDTH)-1:0];
