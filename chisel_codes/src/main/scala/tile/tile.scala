@@ -68,7 +68,7 @@ class tile(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, a
         ls1(i).io := DontCare
 	}
 
-    // === Connect Network Parameters ===
+    // --- Connect Network Parameters ---
     cu.io.pe_io.conv_en := io.conv_en
     cu.io.pe_io.rotated_kernel := io.rotated_kernel
     cu.io.pe_io.kSize := io.kSize

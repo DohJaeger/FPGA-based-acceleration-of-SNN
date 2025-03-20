@@ -13,51 +13,37 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     })
     
     NetworkUtils.initCUIO(io.pe_io, num_col)
-    
-    val conv_done = RegInit(false.B)    // s0
-    val conv_done_s2 = RegNext(conv_done)
-    val conv_done_s3 = RegNext(conv_done_s2)
-    val conv_done_s4 = RegNext(conv_done_s3)
-
-    io.pe_io.conv_done := conv_done_s4
 
     val tot_hor_blk = (io.pe_io.N - 1.U)/3.U
     val se_blk = (io.pe_io.T - 1.U) / 3.U
     val se_col = (io.pe_io.T - 1.U) % 3.U
 
-    val pipe_stall = WireInit(false.B)
+    val pipe_stall = RegInit(false.B)
 
-    // --- Stage 0: Read AEQ ---
-    val aeq_read_col_sel_counter = RegInit(0.U(log2Ceil(9).W))
-    val aeq_read_addr = RegInit(0.U(log2Ceil(aeq_depth).W))
+    // ==== Stage 0: Read AEQ ====
+    val aeqReadStage = Module(new AeqReadStage(aeq_depth, aeq_width))
+    
+    aeqReadStage.io.conv_en := io.pe_io.conv_en
+    val conv_done = aeqReadStage.io.conv_done
 
-    val spike_event = WireInit(0.U(aeq_width.W))
+    io.pe_io.ai_rdaddr := aeqReadStage.io.ai_rdaddr
+    aeqReadStage.io.ai_rddata := io.pe_io.ai_rddata
+
+    val spike_event = aeqReadStage.io.spike_event
+    val spike_valid = aeqReadStage.io.spike_valid
+    val aeq_col_cnt = aeqReadStage.io.aeq_col_cnt
+    // eoq_bit := aeqReadStage.io.eoq_bit
+
+
     val spike_event_s1 = RegNext(spike_event)
-
-    val spike_valid = WireInit(false.B)
     val spike_valid_s1 = RegNext(spike_valid)
 
-    val eoq_bit = WireInit(false.B)
-    
-    io.pe_io.ai_rdaddr(aeq_read_col_sel_counter) := aeq_read_addr
-    
-    spike_event := io.pe_io.ai_rddata(aeq_read_col_sel_counter)
-    spike_valid := spike_event(0)
-    eoq_bit := spike_event(aeq_width - 1)
-    
-    when(aeq_read_col_sel_counter === 8.U && eoq_bit) {
-        aeq_read_col_sel_counter := 0.U
-        conv_done := true.B
-    }.otherwise {
-        when(eoq_bit){
-            aeq_read_addr := 0.U
-            aeq_read_col_sel_counter := aeq_read_col_sel_counter + 1.U
-        }.elsewhen(!pipe_stall && io.pe_io.conv_en && !conv_done){
-            aeq_read_addr := aeq_read_addr + 1.U
-        }
-    }
+    val conv_done_s2 = RegNext(conv_done)
+    val conv_done_s3 = RegNext(conv_done_s2)
+    val conv_done_s4 = RegNext(conv_done_s3)
+    io.pe_io.conv_done := conv_done_s4
 
-    // --- stage - 1: calculate the neighbor address ---
+    // ==== stage - 1: calculate the neighbor address ====
     val i_in = Wire(UInt((aeq_width/2 - 1).W))
     val j_in = Wire(UInt((aeq_width/2 - 1).W))
 
@@ -74,7 +60,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     j_in := (spike_event_s1(aeq_width / 2 - 1, 1)).asUInt
 
     val input_idx = WireInit(0.U(4.W))
-    input_idx := aeq_read_col_sel_counter
+    input_idx := aeq_col_cnt
 
     val boundaryCheck = Module(new BoundaryCheck(aeq_width, dim_width))
     boundaryCheck.io.i := i_in
@@ -114,7 +100,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
 
     // Check if at the north or south edge
-    when(spike_valid_s1 && !pipe_stall && io.pe_io.conv_en && !conv_done){
+    when(spike_valid_s1 && io.pe_io.conv_en && !conv_done){
         when(isNorth) {
             local_valid := true.B
             main_valid := VecInit(Seq.fill(9)(true.B))
@@ -155,7 +141,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     }
 
 
-    // stage - 2: mempot read
+    // ==== stage - 2: mempot read ====
     val input_idx_s2 = RegNext(input_idx)
     val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
 
@@ -169,7 +155,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
     val s2_valid = RegInit(false.B)
 
-    when(!pipe_stall && io.pe_io.conv_en && !conv_done_s2) {
+    when(io.pe_io.conv_en && !conv_done_s2) {
         for (i <- 0 until 9) {
             when(main_valid(i)) {
                 io.pe_io.mm_we(i) := false.B
@@ -196,7 +182,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     
     }
 
-    // stage - 3: convolution
+    // ==== stage - 3: convolution ====
     val s3_conv = Reg(Vec(num_col, UInt(mempot_width.W)))
     val s3_valid = Reg(Bool())
 
@@ -272,7 +258,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
         }
     }
 
-    // Stage-4: Write Back to MemPot
+    // ==== Stage-4: Write Back to MemPot ====
     when(io.pe_io.conv_en && !conv_done_s4) {
         for (i <- 0 until 9) {
             io.pe_io.mm_we(i) := mempot_wr_main_valid(i)
@@ -353,7 +339,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
                 pipe_stall := true.B  // Stall pipeline if addresses match
             }
         }
-    }   
+    }
 
 }
 
