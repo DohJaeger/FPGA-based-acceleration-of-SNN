@@ -19,8 +19,8 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
     val se_col = (io.tu_io.T - 1.U) % 3.U
 
     // stage 1: mempot access
-    val i_cnt = RegInit(0.U(log2Ceil((aeq_width / 2 - 1)).W))
-    val j_cnt = RegInit(0.U(log2Ceil(aeq_width / 2 - 1).W))
+    val i_cnt = RegInit(0.U((log2Ceil((aeq_width / 2)) + 1).W))
+    val j_cnt = RegInit(0.U((log2Ceil(aeq_width / 2) + 1).W))
     val addr_write = Reg(UInt((aeq_width - 2).W))
     val addr_write_s3 = RegNext(RegNext(addr_write))
     val i_cnt_s3 = RegNext(RegNext(i_cnt))
@@ -28,6 +28,8 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
 
     addr_write := Cat(i_cnt, j_cnt)
 
+    // val mempot_rd_main  = WireInit(VecInit(Seq.fill(9)(0.U(mempot_width.W))))
+    // val mempot_rd_local = WireInit(VecInit(Seq.fill(3)(0.U(mempot_width.W))))
     val mempot_rd_main = Reg(Vec(9, UInt(mempot_width.W)))
     val mempot_rd_local = Reg(Vec(3, UInt(mempot_width.W)))
 
@@ -42,14 +44,21 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
     val isNorth_s2 = RegNext(isNorth)
     val isSouth_s2 = RegNext(isSouth)
 
-    j_cnt := Mux((j_cnt <= j_max) && (i_cnt === i_max), j_cnt + 1.U, j_cnt)
+    when(io.tu_io.thresh_en) {
+        when(j_cnt === j_max){
+            j_cnt := 0.U
+            i_cnt := Mux(i_cnt < i_max, i_cnt + 1.U, 0.U)
+        } .otherwise {
+            j_cnt := j_cnt + 1.U
+        }
+    }
 
     io.tu_io.thresh_done := RegNext(RegNext(RegNext(RegNext(i_cnt === i_max && j_cnt === j_max))))
 
     // mem access
-    when(io.tu_io.thresh_en && (j_cnt <= j_max)) {
+    when(io.tu_io.thresh_en) {
         for (i <- 0 until 9) {
-            io.tu_io.mm_rdaddr(i) := i_cnt + j_cnt * j_max
+            io.tu_io.mm_rdaddr(i) := i_cnt * (j_max + 1.U) + j_cnt
             mempot_rd_main(i) := io.tu_io.mm_rddata(i)
         }
 
@@ -71,16 +80,6 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
             for (i <- 0 until 3) {
                 mempot_rd_local(i) := 0.U
             }
-        }
-
-        i_cnt := i_cnt + 1.U
-
-    }.otherwise {
-        for (i <- 0 until 9) {
-            mempot_rd_main(i) := 0.U
-        }
-        for (i <- 0 until 3) {
-            mempot_rd_local(i) := 0.U
         }
     }
 
@@ -110,9 +109,11 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
         when(j_cnt === j_max) {
             row_component_j := 0.U
             addr_component_j := addr_component_j + 1.U
+
         }.elsewhen(row_component_j === 6.U) {
             row_component_j := 0.U
             addr_component_j := addr_component_j + 1.U
+
         }.otherwise {
             row_component_j := row_component_j + 3.U
         }
@@ -183,7 +184,7 @@ class tu3(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, ae
     when(io.tu_io.maxpool_en) {
         // maxpool enabled
         io.tu_io.ao_we(maxpool_row_s3) := spike_or
-        io.tu_io.ao_wraddr(maxpool_row_s3) := i_cnt_s3 + j_max * j_cnt_s3
+        io.tu_io.ao_wraddr(maxpool_row_s3) := i_cnt_s3 * j_max + j_cnt_s3
         io.tu_io.ao_wrdata(maxpool_row_s3) := Cat((i_cnt_s3 === i_max) && (j_cnt_s3 === j_max), addr_write_s3, 1.U)
     }.otherwise {
         // maxpool disabled

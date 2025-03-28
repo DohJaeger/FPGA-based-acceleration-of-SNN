@@ -50,411 +50,1338 @@
   `endif // not def ENABLE_INITIAL_MEM_
 `endif // not def SYNTHESIS
 
-module AeqReadStage(	// src/main/scala/tile_test/aeq.scala:22:7
-  input        clock,	// src/main/scala/tile_test/aeq.scala:22:7
-               reset,	// src/main/scala/tile_test/aeq.scala:22:7
-               io_conv_en,	// src/main/scala/tile_test/aeq.scala:23:16
-  output       io_conv_done,	// src/main/scala/tile_test/aeq.scala:23:16
-  output [9:0] io_ai_rdaddr_0,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_1,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_2,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_3,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_4,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_5,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_6,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_7,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_8,	// src/main/scala/tile_test/aeq.scala:23:16
-  input  [9:0] io_ai_rddata_0,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_1,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_2,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_3,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_4,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_5,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_6,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_7,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_8,	// src/main/scala/tile_test/aeq.scala:23:16
-  output [9:0] io_spike_event,	// src/main/scala/tile_test/aeq.scala:23:16
-  output       io_spike_valid,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_eoq_bit	// src/main/scala/tile_test/aeq.scala:23:16
+module AeqReadStage(	// src/main/scala/tile/aeq.scala:23:7
+  input        clock,	// src/main/scala/tile/aeq.scala:23:7
+               reset,	// src/main/scala/tile/aeq.scala:23:7
+               io_conv_en,	// src/main/scala/tile/aeq.scala:24:16
+               io_pipe_stall,	// src/main/scala/tile/aeq.scala:24:16
+  output       io_conv_done,	// src/main/scala/tile/aeq.scala:24:16
+  output [9:0] io_ai_rdaddr_0,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_1,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_2,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_3,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_4,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_5,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_6,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_7,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_8,	// src/main/scala/tile/aeq.scala:24:16
+  input  [9:0] io_ai_rddata_0,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_1,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_2,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_3,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_4,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_5,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_6,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_7,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_8,	// src/main/scala/tile/aeq.scala:24:16
+  output [3:0] io_aeq_col_cnt,	// src/main/scala/tile/aeq.scala:24:16
+  output [9:0] io_spike_event,	// src/main/scala/tile/aeq.scala:24:16
+  output       io_spike_valid	// src/main/scala/tile/aeq.scala:24:16
 );
 
-  reg  [3:0] aeq_read_col_sel_counter;	// src/main/scala/tile_test/aeq.scala:25:43
-  reg  [9:0] aeq_read_addr;	// src/main/scala/tile_test/aeq.scala:26:32
-  reg  [9:0] spike_event_reg;	// src/main/scala/tile_test/aeq.scala:28:34
-  reg        spike_valid_reg;	// src/main/scala/tile_test/aeq.scala:29:34
-  reg        eoq_bit_reg;	// src/main/scala/tile_test/aeq.scala:30:30
-  wire       read_en = aeq_read_col_sel_counter < 4'h9;	// src/main/scala/tile_test/aeq.scala:25:43, :44:35
-  wire       _GEN = aeq_read_col_sel_counter == 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_0 = aeq_read_col_sel_counter == 4'h1;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_1 = aeq_read_col_sel_counter == 4'h2;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_2 = aeq_read_col_sel_counter == 4'h3;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_3 = aeq_read_col_sel_counter == 4'h4;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_4 = aeq_read_col_sel_counter == 4'h5;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_5 = aeq_read_col_sel_counter == 4'h6;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_6 = aeq_read_col_sel_counter == 4'h7;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire       _GEN_7 = aeq_read_col_sel_counter == 4'h8;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48
-  wire [9:0] selected_data =
-    _GEN_7
-      ? io_ai_rddata_8
-      : _GEN_6
-          ? io_ai_rddata_7
-          : _GEN_5
-              ? io_ai_rddata_6
-              : _GEN_4
-                  ? io_ai_rddata_5
-                  : _GEN_3
-                      ? io_ai_rddata_4
-                      : _GEN_2
-                          ? io_ai_rddata_3
-                          : _GEN_1
-                              ? io_ai_rddata_2
-                              : _GEN_0 ? io_ai_rddata_1 : _GEN ? io_ai_rddata_0 : 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32, :45:48, :50:19, :52:48, :53:27
-  wire       _GEN_8 = io_conv_en & read_en;	// src/main/scala/tile_test/aeq.scala:44:35, :60:21
-  always @(posedge clock) begin	// src/main/scala/tile_test/aeq.scala:22:7
-    if (reset) begin	// src/main/scala/tile_test/aeq.scala:22:7
-      aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-      aeq_read_addr <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32
-      spike_event_reg <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32, :28:34
-      spike_valid_reg <= 1'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :29:34
-      eoq_bit_reg <= 1'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :30:30
+  reg  [3:0] aeq_read_col_sel_counter;	// src/main/scala/tile/aeq.scala:26:43
+  reg  [9:0] aeq_read_addr;	// src/main/scala/tile/aeq.scala:27:32
+  reg  [9:0] spike_event_reg;	// src/main/scala/tile/aeq.scala:29:34
+  reg        spike_valid_reg;	// src/main/scala/tile/aeq.scala:30:34
+  reg        conv_done_reg;	// src/main/scala/tile/aeq.scala:32:32
+  wire       read_en = aeq_read_col_sel_counter < 4'h9;	// src/main/scala/tile/aeq.scala:26:43, :47:35
+  wire       _GEN = aeq_read_col_sel_counter == 4'h0;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_0 = aeq_read_col_sel_counter == 4'h1;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_1 = aeq_read_col_sel_counter == 4'h2;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_2 = aeq_read_col_sel_counter == 4'h3;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_3 = aeq_read_col_sel_counter == 4'h4;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_4 = aeq_read_col_sel_counter == 4'h5;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_5 = aeq_read_col_sel_counter == 4'h6;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_6 = aeq_read_col_sel_counter == 4'h7;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_7 = aeq_read_col_sel_counter == 4'h8;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  always @(posedge clock) begin	// src/main/scala/tile/aeq.scala:23:7
+    if (reset) begin	// src/main/scala/tile/aeq.scala:23:7
+      aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+      aeq_read_addr <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32
+      spike_event_reg <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32, :29:34
+      spike_valid_reg <= 1'h0;	// src/main/scala/tile/aeq.scala:23:7, :30:34
+      conv_done_reg <= 1'h0;	// src/main/scala/tile/aeq.scala:23:7, :32:32
     end
-    else begin	// src/main/scala/tile_test/aeq.scala:22:7
-      if (_GEN_8) begin	// src/main/scala/tile_test/aeq.scala:60:21
-        if (selected_data[9]) begin	// src/main/scala/tile_test/aeq.scala:52:48, :53:27, :58:32
-          if (_GEN_7)	// src/main/scala/tile_test/aeq.scala:45:48
-            aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-          else	// src/main/scala/tile_test/aeq.scala:45:48
-            aeq_read_col_sel_counter <= aeq_read_col_sel_counter + 4'h1;	// src/main/scala/tile_test/aeq.scala:25:43, :45:48, :71:70
+    else begin	// src/main/scala/tile/aeq.scala:23:7
+      automatic logic [9:0] selected_data;	// src/main/scala/tile/aeq.scala:55:48, :56:27
+      automatic logic       _GEN_8 = io_conv_en & read_en;	// src/main/scala/tile/aeq.scala:47:35, :63:21
+      selected_data =
+        _GEN_7
+          ? io_ai_rddata_8
+          : _GEN_6
+              ? io_ai_rddata_7
+              : _GEN_5
+                  ? io_ai_rddata_6
+                  : _GEN_4
+                      ? io_ai_rddata_5
+                      : _GEN_3
+                          ? io_ai_rddata_4
+                          : _GEN_2
+                              ? io_ai_rddata_3
+                              : _GEN_1
+                                  ? io_ai_rddata_2
+                                  : _GEN_0
+                                      ? io_ai_rddata_1
+                                      : _GEN ? io_ai_rddata_0 : 10'h0;	// src/main/scala/tile/aeq.scala:27:32, :48:48, :53:19, :55:48, :56:27
+      if (_GEN_8) begin	// src/main/scala/tile/aeq.scala:63:21
+        if (selected_data[9]) begin	// src/main/scala/tile/aeq.scala:55:48, :56:27, :61:32
+          if (_GEN_7)	// src/main/scala/tile/aeq.scala:48:48
+            aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+          else if (io_pipe_stall) begin	// src/main/scala/tile/aeq.scala:24:16
+          end
+          else	// src/main/scala/tile/aeq.scala:24:16
+            aeq_read_col_sel_counter <= aeq_read_col_sel_counter + 4'h1;	// src/main/scala/tile/aeq.scala:26:43, :48:48, :75:74
         end
-        spike_event_reg <= selected_data;	// src/main/scala/tile_test/aeq.scala:28:34, :52:48, :53:27
-        spike_valid_reg <= selected_data[0];	// src/main/scala/tile_test/aeq.scala:29:34, :52:48, :53:27, :57:36
-        eoq_bit_reg <= selected_data[9];	// src/main/scala/tile_test/aeq.scala:30:30, :52:48, :53:27, :58:32
+        spike_event_reg <= selected_data;	// src/main/scala/tile/aeq.scala:29:34, :55:48, :56:27
+        spike_valid_reg <= selected_data[0];	// src/main/scala/tile/aeq.scala:30:34, :55:48, :56:27, :60:36
       end
-      else	// src/main/scala/tile_test/aeq.scala:60:21
-        aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-      if (~_GEN_8 | selected_data[9])	// src/main/scala/tile_test/aeq.scala:52:48, :53:27, :58:32, :60:{21,33}, :65:23, :78:23
-        aeq_read_addr <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32
-      else if (selected_data[0])	// src/main/scala/tile_test/aeq.scala:52:48, :53:27, :57:36
-        aeq_read_addr <= aeq_read_addr + 10'h1;	// src/main/scala/tile_test/aeq.scala:26:32, :74:44
+      else	// src/main/scala/tile/aeq.scala:63:21
+        aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+      if (~_GEN_8 | selected_data[9])	// src/main/scala/tile/aeq.scala:55:48, :56:27, :61:32, :63:{21,33}, :68:23, :89:23
+        aeq_read_addr <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32
+      else if (selected_data[0] & ~io_pipe_stall)	// src/main/scala/tile/aeq.scala:27:32, :55:48, :56:27, :60:36, :74:22, :80:33, :81:33, :82:31, :84:31
+        aeq_read_addr <= aeq_read_addr + 10'h1;	// src/main/scala/tile/aeq.scala:27:32, :82:48
+      conv_done_reg <= _GEN_8 & selected_data[9] & _GEN_7 | conv_done_reg;	// src/main/scala/tile/aeq.scala:32:32, :48:48, :55:48, :56:27, :61:32, :63:{21,33}, :68:23, :70:52, :71:31
     end
   end // always @(posedge)
-  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/tile_test/aeq.scala:22:7
-    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
-      `FIRRTL_BEFORE_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
+  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/tile/aeq.scala:23:7
+    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/aeq.scala:23:7
+      `FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/aeq.scala:23:7
     `endif // FIRRTL_BEFORE_INITIAL
-    initial begin	// src/main/scala/tile_test/aeq.scala:22:7
-      automatic logic [31:0] _RANDOM[0:0];	// src/main/scala/tile_test/aeq.scala:22:7
-      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/tile_test/aeq.scala:22:7
-        `INIT_RANDOM_PROLOG_	// src/main/scala/tile_test/aeq.scala:22:7
+    initial begin	// src/main/scala/tile/aeq.scala:23:7
+      automatic logic [31:0] _RANDOM[0:0];	// src/main/scala/tile/aeq.scala:23:7
+      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/tile/aeq.scala:23:7
+        `INIT_RANDOM_PROLOG_	// src/main/scala/tile/aeq.scala:23:7
       `endif // INIT_RANDOM_PROLOG_
-      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/tile_test/aeq.scala:22:7
-        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// src/main/scala/tile_test/aeq.scala:22:7
-        aeq_read_col_sel_counter = _RANDOM[/*Zero width*/ 1'b0][3:0];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43
-        aeq_read_addr = _RANDOM[/*Zero width*/ 1'b0][13:4];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :26:32
-        spike_event_reg = _RANDOM[/*Zero width*/ 1'b0][23:14];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :28:34
-        spike_valid_reg = _RANDOM[/*Zero width*/ 1'b0][24];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :29:34
-        eoq_bit_reg = _RANDOM[/*Zero width*/ 1'b0][25];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :30:30
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/tile/aeq.scala:23:7
+        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// src/main/scala/tile/aeq.scala:23:7
+        aeq_read_col_sel_counter = _RANDOM[/*Zero width*/ 1'b0][3:0];	// src/main/scala/tile/aeq.scala:23:7, :26:43
+        aeq_read_addr = _RANDOM[/*Zero width*/ 1'b0][13:4];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :27:32
+        spike_event_reg = _RANDOM[/*Zero width*/ 1'b0][23:14];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :29:34
+        spike_valid_reg = _RANDOM[/*Zero width*/ 1'b0][24];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :30:34
+        conv_done_reg = _RANDOM[/*Zero width*/ 1'b0][26];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :32:32
       `endif // RANDOMIZE_REG_INIT
     end // initial
-    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
-      `FIRRTL_AFTER_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
+    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/tile/aeq.scala:23:7
+      `FIRRTL_AFTER_INITIAL	// src/main/scala/tile/aeq.scala:23:7
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  assign io_conv_done = _GEN_8 & selected_data[9] & _GEN_7;	// src/main/scala/tile_test/aeq.scala:22:7, :38:18, :45:48, :52:48, :53:27, :58:32, :60:{21,33}, :65:23, :67:52
-  assign io_ai_rdaddr_0 = read_en & _GEN ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_1 = read_en & _GEN_0 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_2 = read_en & _GEN_1 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_3 = read_en & _GEN_2 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_4 = read_en & _GEN_3 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_5 = read_en & _GEN_4 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_6 = read_en & _GEN_5 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_7 = read_en & _GEN_6 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_ai_rdaddr_8 = read_en & _GEN_7 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :41:25, :44:{35,42}, :45:48
-  assign io_spike_event = spike_event_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :28:34
-  assign io_spike_valid = spike_valid_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :29:34
-  assign io_eoq_bit = eoq_bit_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :30:30
+  assign io_conv_done = conv_done_reg;	// src/main/scala/tile/aeq.scala:23:7, :32:32
+  assign io_ai_rdaddr_0 = read_en & _GEN ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_1 = read_en & _GEN_0 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_2 = read_en & _GEN_1 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_3 = read_en & _GEN_2 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_4 = read_en & _GEN_3 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_5 = read_en & _GEN_4 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_6 = read_en & _GEN_5 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_7 = read_en & _GEN_6 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_8 = read_en & _GEN_7 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_aeq_col_cnt = aeq_read_col_sel_counter;	// src/main/scala/tile/aeq.scala:23:7, :26:43
+  assign io_spike_event = spike_event_reg;	// src/main/scala/tile/aeq.scala:23:7, :29:34
+  assign io_spike_valid = spike_valid_reg;	// src/main/scala/tile/aeq.scala:23:7, :30:34
 endmodule
 
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-// external module tdpb_init
-
-module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:83:7
-  input        clock,	// src/main/scala/tile_test/aeq.scala:83:7
-               reset,	// src/main/scala/tile_test/aeq.scala:83:7
-               io_conv_en,	// src/main/scala/tile_test/aeq.scala:84:16
-  output       io_conv_done,	// src/main/scala/tile_test/aeq.scala:84:16
-  output [9:0] io_spike_event,	// src/main/scala/tile_test/aeq.scala:84:16
-  output       io_spike_valid,	// src/main/scala/tile_test/aeq.scala:84:16
-               io_eoq_bit	// src/main/scala/tile_test/aeq.scala:84:16
+module BoundaryCheck(	// src/main/scala/tile/basic_units.scala:6:7
+  input  [2:0] io_i,	// src/main/scala/tile/basic_units.scala:7:14
+  input  [9:0] io_se_blk,	// src/main/scala/tile/basic_units.scala:7:14
+               io_se_col,	// src/main/scala/tile/basic_units.scala:7:14
+  input  [3:0] io_col,	// src/main/scala/tile/basic_units.scala:7:14
+  output [3:0] io_col_out,	// src/main/scala/tile/basic_units.scala:7:14
+  output       io_isNorth,	// src/main/scala/tile/basic_units.scala:7:14
+               io_isSouth	// src/main/scala/tile/basic_units.scala:7:14
 );
 
-  wire [9:0] _tdpb_init_8_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_7_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_6_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_5_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_4_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_3_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_2_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_1_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _tdpb_init_doa;	// src/main/scala/tile_test/aeq.scala:103:31
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_0;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_1;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_2;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_3;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_4;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_5;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_6;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_7;	// src/main/scala/tile_test/aeq.scala:93:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_8;	// src/main/scala/tile_test/aeq.scala:93:30
-  AeqReadStage aeqReadStage (	// src/main/scala/tile_test/aeq.scala:93:30
+  wire p1 = io_col[2] & io_col[1] | io_col[3];	// src/main/scala/tile/basic_units.scala:17:{19,23,31,36,44}
+  wire p0 = ~(io_col[2]) & io_col[1] & io_col[0] | io_col[2] & ~(io_col[1]);	// src/main/scala/tile/basic_units.scala:17:{19,31}, :18:{13,36,44,49,62,64}
+  assign io_col_out = {2'h0, p1, p0};	// src/main/scala/tile/basic_units.scala:6:7, :17:36, :18:49, :19:20
+  assign io_isNorth = io_i == 3'h0 & {p1, p0} == 2'h0;	// src/main/scala/tile/basic_units.scala:6:7, :17:36, :18:49, :19:20, :22:{23,32,44}
+  assign io_isSouth = {7'h0, io_i} == io_se_blk & {8'h0, p1, p0} == io_se_col;	// src/main/scala/tile/basic_units.scala:6:7, :17:36, :18:49, :23:{23,38,50}
+endmodule
+
+module AddrCalc(	// src/main/scala/tile/basic_units.scala:26:7
+  input  [3:0] io_input_idx,	// src/main/scala/tile/basic_units.scala:27:20
+               io_i,	// src/main/scala/tile/basic_units.scala:27:20
+               io_j,	// src/main/scala/tile/basic_units.scala:27:20
+  output [3:0] io_new_i_0,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_1,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_2,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_3,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_4,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_5,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_6,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_7,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_i_8,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_0,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_1,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_2,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_3,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_4,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_5,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_6,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_7,	// src/main/scala/tile/basic_units.scala:27:20
+               io_new_j_8	// src/main/scala/tile/basic_units.scala:27:20
+);
+
+  wire       _GEN = io_input_idx == 4'h2;	// src/main/scala/tile/basic_units.scala:38:27
+  wire       _GEN_0 = io_input_idx == 4'h8;	// src/main/scala/tile/basic_units.scala:38:75
+  wire       _GEN_1 = _GEN | io_input_idx == 4'h5 | _GEN_0;	// src/main/scala/tile/basic_units.scala:38:{27,51,59,75}
+  wire [3:0] _io_new_j_6_T = io_j + 4'h1;	// src/main/scala/tile/basic_units.scala:39:37, :68:51
+  wire       _GEN_2 = io_input_idx == 4'h6;	// src/main/scala/tile/basic_units.scala:48:27
+  wire       _GEN_3 = _GEN_2 | io_input_idx == 4'h7 | _GEN_0;	// src/main/scala/tile/basic_units.scala:38:75, :48:{27,51,59}
+  wire [3:0] _io_new_i_2_T = io_i + 4'h1;	// src/main/scala/tile/basic_units.scala:49:37, :68:51
+  wire       _GEN_4 = io_input_idx == 4'h0;	// src/main/scala/tile/basic_units.scala:39:37, :58:27
+  wire       _GEN_5 = _GEN_4 | io_input_idx == 4'h3 | _GEN_2;	// src/main/scala/tile/basic_units.scala:48:27, :58:{27,51,59}
+  wire [3:0] _io_new_j_8_T = io_j - 4'h1;	// src/main/scala/tile/basic_units.scala:59:37
+  wire       _GEN_6 = _GEN_4 | io_input_idx == 4'h1 | _GEN;	// src/main/scala/tile/basic_units.scala:38:27, :58:27, :68:{51,59}
+  wire [3:0] _io_new_i_8_T = io_i - 4'h1;	// src/main/scala/tile/basic_units.scala:69:37
+  assign io_new_i_0 = _GEN_3 ? _io_new_i_2_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :48:{59,84}, :49:{29,37}, :53:21
+  assign io_new_i_1 = _GEN_3 ? _io_new_i_2_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :48:{59,84}, :49:37, :50:21, :54:21
+  assign io_new_i_2 = _GEN_3 ? _io_new_i_2_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :48:{59,84}, :49:37, :51:21, :55:21
+  assign io_new_i_3 = io_i;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_i_4 = io_i;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_i_5 = io_i;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_i_6 = _GEN_6 ? _io_new_i_8_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :68:{59,84}, :69:{29,37}, :73:21
+  assign io_new_i_7 = _GEN_6 ? _io_new_i_8_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :68:{59,84}, :69:37, :70:21, :74:21
+  assign io_new_i_8 = _GEN_6 ? _io_new_i_8_T : io_i;	// src/main/scala/tile/basic_units.scala:26:7, :68:{59,84}, :69:37, :71:21, :75:21
+  assign io_new_j_0 = _GEN_1 ? _io_new_j_6_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :38:{59,84}, :39:{29,37}, :43:21
+  assign io_new_j_1 = io_j;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_j_2 = _GEN_5 ? _io_new_j_8_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :58:{59,84}, :59:{29,37}, :63:21
+  assign io_new_j_3 = _GEN_1 ? _io_new_j_6_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :38:{59,84}, :39:37, :40:21, :44:21
+  assign io_new_j_4 = io_j;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_j_5 = _GEN_5 ? _io_new_j_8_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :58:{59,84}, :59:37, :60:21, :64:21
+  assign io_new_j_6 = _GEN_1 ? _io_new_j_6_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :38:{59,84}, :39:37, :41:21, :45:21
+  assign io_new_j_7 = io_j;	// src/main/scala/tile/basic_units.scala:26:7
+  assign io_new_j_8 = _GEN_5 ? _io_new_j_8_T : io_j;	// src/main/scala/tile/basic_units.scala:26:7, :58:{59,84}, :59:37, :61:21, :65:21
+endmodule
+
+module cu(	// src/main/scala/tile/cu.scala:10:7
+  input        clock,	// src/main/scala/tile/cu.scala:10:7
+               reset,	// src/main/scala/tile/cu.scala:10:7
+  output [9:0] io_pe_io_mm_rdaddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rdaddr_8,	// src/main/scala/tile/cu.scala:11:16
+  input  [7:0] io_pe_io_mm_rddata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_rddata_8,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_mm_wraddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wraddr_8,	// src/main/scala/tile/cu.scala:11:16
+  output [7:0] io_pe_io_mm_wrdata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_wrdata_8,	// src/main/scala/tile/cu.scala:11:16
+  output       io_pe_io_mm_we_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_mm_we_8,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_ln2_rdaddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_rdaddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_rdaddr_2,	// src/main/scala/tile/cu.scala:11:16
+  input  [7:0] io_pe_io_ln2_rddata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_rddata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_rddata_2,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_ln2_wraddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_wraddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_wraddr_2,	// src/main/scala/tile/cu.scala:11:16
+  output [7:0] io_pe_io_ln2_wrdata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_wrdata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_wrdata_2,	// src/main/scala/tile/cu.scala:11:16
+  output       io_pe_io_ln2_we_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_we_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ln2_we_2,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_ls2_rdaddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_rdaddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_rdaddr_2,	// src/main/scala/tile/cu.scala:11:16
+  input  [7:0] io_pe_io_ls2_rddata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_rddata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_rddata_2,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_ls2_wraddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_wraddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_wraddr_2,	// src/main/scala/tile/cu.scala:11:16
+  output [7:0] io_pe_io_ls2_wrdata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_wrdata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_wrdata_2,	// src/main/scala/tile/cu.scala:11:16
+  output       io_pe_io_ls2_we_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_we_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ls2_we_2,	// src/main/scala/tile/cu.scala:11:16
+  output [9:0] io_pe_io_ai_rdaddr_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rdaddr_8,	// src/main/scala/tile/cu.scala:11:16
+  input  [9:0] io_pe_io_ai_rddata_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_ai_rddata_8,	// src/main/scala/tile/cu.scala:11:16
+  input        io_pe_io_conv_en,	// src/main/scala/tile/cu.scala:11:16
+  input  [7:0] io_pe_io_rotated_kernel_0,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_1,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_2,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_3,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_4,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_5,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_6,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_7,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_rotated_kernel_8,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_kSize,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_T,	// src/main/scala/tile/cu.scala:11:16
+               io_pe_io_N,	// src/main/scala/tile/cu.scala:11:16
+  output       io_pe_io_conv_done	// src/main/scala/tile/cu.scala:11:16
+);
+
+  wire [3:0]      _addrCalc_io_new_i_0;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_1;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_2;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_3;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_4;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_5;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_6;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_7;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_i_8;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_0;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_1;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_2;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_3;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_4;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_5;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_6;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_7;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _addrCalc_io_new_j_8;	// src/main/scala/tile/cu.scala:97:26
+  wire [3:0]      _boundaryCheck_io_col_out;	// src/main/scala/tile/cu.scala:69:31
+  wire            _boundaryCheck_io_isNorth;	// src/main/scala/tile/cu.scala:69:31
+  wire            _boundaryCheck_io_isSouth;	// src/main/scala/tile/cu.scala:69:31
+  wire            _aeqReadStage_io_conv_done;	// src/main/scala/tile/cu.scala:24:30
+  wire [3:0]      _aeqReadStage_io_aeq_col_cnt;	// src/main/scala/tile/cu.scala:24:30
+  wire [9:0]      _aeqReadStage_io_spike_event;	// src/main/scala/tile/cu.scala:24:30
+  wire            _aeqReadStage_io_spike_valid;	// src/main/scala/tile/cu.scala:24:30
+  wire [7:0]      _se_col_T = io_pe_io_T - 8'h1;	// src/main/scala/tile/cu.scala:18:30
+  wire [7:0]      se_col = _se_col_T % 8'h3;	// src/main/scala/tile/cu.scala:18:{30,37}, :19:37
+  reg             pipe_stall;	// src/main/scala/tile/cu.scala:21:29
+  reg  [9:0]      spike_event_s1;	// src/main/scala/tile/cu.scala:39:33
+  reg             spike_valid_s1;	// src/main/scala/tile/cu.scala:40:33
+  reg             spike_valid_s2;	// src/main/scala/tile/cu.scala:41:33
+  reg             spike_valid_s3;	// src/main/scala/tile/cu.scala:42:33
+  reg             spike_valid_s4;	// src/main/scala/tile/cu.scala:43:33
+  reg             conv_done_s2;	// src/main/scala/tile/cu.scala:45:31
+  reg             conv_done_s3;	// src/main/scala/tile/cu.scala:46:31
+  reg             conv_done_s4;	// src/main/scala/tile/cu.scala:47:31
+  reg  [7:0]      addr_calc_main_0;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_1;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_2;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_3;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_4;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_5;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_6;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_7;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_main_8;	// src/main/scala/tile/cu.scala:54:29
+  reg  [7:0]      addr_calc_local_0;	// src/main/scala/tile/cu.scala:55:30
+  reg  [7:0]      addr_calc_local_1;	// src/main/scala/tile/cu.scala:55:30
+  reg  [7:0]      addr_calc_local_2;	// src/main/scala/tile/cu.scala:55:30
+  reg  [7:0]      addr_calc_main_s3_0;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_1;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_2;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_3;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_4;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_5;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_6;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_7;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_main_s3_8;	// src/main/scala/tile/cu.scala:57:36
+  reg  [7:0]      addr_calc_local_s3_0;	// src/main/scala/tile/cu.scala:58:37
+  reg  [7:0]      addr_calc_local_s3_1;	// src/main/scala/tile/cu.scala:58:37
+  reg  [7:0]      addr_calc_local_s3_2;	// src/main/scala/tile/cu.scala:58:37
+  reg  [7:0]      addr_calc_main_s4_0;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_1;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_2;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_3;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_4;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_5;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_6;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_7;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_main_s4_8;	// src/main/scala/tile/cu.scala:60:36
+  reg  [7:0]      addr_calc_local_s4_0;	// src/main/scala/tile/cu.scala:61:37
+  reg  [7:0]      addr_calc_local_s4_1;	// src/main/scala/tile/cu.scala:61:37
+  reg  [7:0]      addr_calc_local_s4_2;	// src/main/scala/tile/cu.scala:61:37
+  reg             isNorth_s2;	// src/main/scala/tile/cu.scala:79:29
+  reg             isSouth_s2;	// src/main/scala/tile/cu.scala:80:29
+  reg             isNorth_s3;	// src/main/scala/tile/cu.scala:81:29
+  reg             isSouth_s3;	// src/main/scala/tile/cu.scala:82:29
+  reg             isNorth_s4;	// src/main/scala/tile/cu.scala:83:29
+  reg             isSouth_s4;	// src/main/scala/tile/cu.scala:84:29
+  reg  [3:0]      col_num_s3_REG;	// src/main/scala/tile/cu.scala:85:37
+  reg  [3:0]      col_num_s3;	// src/main/scala/tile/cu.scala:85:29
+  reg  [3:0]      input_idx_s2;	// src/main/scala/tile/cu.scala:149:31
+  reg  [7:0]      kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24
+  reg  [7:0]      kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24
+  wire [9:0]      io_pe_io_ls2_rdaddr_0_0 = {2'h0, addr_calc_local_0};	// src/main/scala/tile/cu.scala:55:30, :71:29, :174:40
+  wire [9:0]      io_pe_io_ls2_rdaddr_1_0 = {2'h0, addr_calc_local_1};	// src/main/scala/tile/cu.scala:55:30, :71:29, :174:40
+  wire [9:0]      io_pe_io_ls2_rdaddr_2_0 = {2'h0, addr_calc_local_2};	// src/main/scala/tile/cu.scala:55:30, :71:29, :174:40
+  wire [7:0]      _GEN = isSouth_s2 ? io_pe_io_ls2_rddata_0 : io_pe_io_ln2_rddata_0;	// src/main/scala/tile/cu.scala:80:29, :171:26, :179:26, :183:36
+  wire [7:0]      _GEN_0 = isSouth_s2 ? io_pe_io_ls2_rddata_1 : io_pe_io_ln2_rddata_1;	// src/main/scala/tile/cu.scala:80:29, :171:26, :179:26, :183:36
+  wire [7:0]      _GEN_1 = isSouth_s2 ? io_pe_io_ls2_rddata_2 : io_pe_io_ln2_rddata_2;	// src/main/scala/tile/cu.scala:80:29, :171:26, :179:26, :183:36
+  reg  [7:0]      s3_conv_0;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_1;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_2;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_3;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_4;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_5;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_6;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_7;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      s3_conv_8;	// src/main/scala/tile/cu.scala:190:22
+  reg  [7:0]      mempot_wr_main_0;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_1;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_2;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_3;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_4;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_5;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_6;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_7;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_main_8;	// src/main/scala/tile/cu.scala:240:29
+  reg  [7:0]      mempot_wr_local_0;	// src/main/scala/tile/cu.scala:241:30
+  reg  [7:0]      mempot_wr_local_1;	// src/main/scala/tile/cu.scala:241:30
+  reg  [7:0]      mempot_wr_local_2;	// src/main/scala/tile/cu.scala:241:30
+  reg             mempot_wr_main_valid_0;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_1;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_2;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_3;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_4;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_5;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_6;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_7;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_main_valid_8;	// src/main/scala/tile/cu.scala:243:39
+  reg             mempot_wr_local_valid;	// src/main/scala/tile/cu.scala:244:40
+  wire            _GEN_2 = spike_valid_s4 & io_pe_io_conv_en & ~conv_done_s4;	// src/main/scala/tile/cu.scala:43:33, :47:31, :269:{45,48}
+  wire [9:0]      io_pe_io_ls2_wraddr_0_0 = {2'h0, addr_calc_local_s4_0};	// src/main/scala/tile/cu.scala:61:37, :71:29, :278:40
+  wire            io_pe_io_ln2_we_2_0 = _GEN_2 & isNorth_s4 & mempot_wr_local_valid;	// src/main/scala/tile/cu.scala:83:29, :162:63, :244:40, :269:{45,63}, :276:26, :279:36
+  wire [9:0]      io_pe_io_ls2_wraddr_1_0 = {2'h0, addr_calc_local_s4_1};	// src/main/scala/tile/cu.scala:61:37, :71:29, :278:40
+  wire [9:0]      io_pe_io_ls2_wraddr_2_0 = {2'h0, addr_calc_local_s4_2};	// src/main/scala/tile/cu.scala:61:37, :71:29, :278:40
+  wire            io_pe_io_ls2_we_2_0 =
+    _GEN_2 & ~isNorth_s4 & isSouth_s4 & mempot_wr_local_valid;	// src/main/scala/tile/cu.scala:83:29, :84:29, :162:63, :244:40, :269:{45,63}, :276:26, :282:31
+  wire            _GEN_3 = io_pe_io_conv_en & spike_valid_s4 & spike_valid_s2;	// src/main/scala/tile/cu.scala:41:33, :43:33, :298:45
+  wire            _GEN_4 = ~isNorth_s2 & ~isSouth_s2;	// src/main/scala/tile/cu.scala:79:29, :80:29, :299:{14,26,28}
+  wire [7:0]      mempot_rd_main_0 =
+    _GEN_3 & _GEN_4 & addr_calc_main_0 == addr_calc_main_s4_0
+      ? s3_conv_0
+      : io_pe_io_mm_rddata_0;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_1 =
+    _GEN_3 & _GEN_4 & addr_calc_main_1 == addr_calc_main_s4_1
+      ? s3_conv_1
+      : io_pe_io_mm_rddata_1;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_2 =
+    _GEN_3 & _GEN_4 & addr_calc_main_2 == addr_calc_main_s4_2
+      ? s3_conv_2
+      : io_pe_io_mm_rddata_2;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_3 =
+    _GEN_3 & _GEN_4 & addr_calc_main_3 == addr_calc_main_s4_3
+      ? s3_conv_3
+      : io_pe_io_mm_rddata_3;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_4 =
+    _GEN_3 & _GEN_4 & addr_calc_main_4 == addr_calc_main_s4_4
+      ? s3_conv_4
+      : io_pe_io_mm_rddata_4;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_5 =
+    _GEN_3 & _GEN_4 & addr_calc_main_5 == addr_calc_main_s4_5
+      ? s3_conv_5
+      : io_pe_io_mm_rddata_5;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_6 =
+    _GEN_3 & _GEN_4 & addr_calc_main_6 == addr_calc_main_s4_6
+      ? s3_conv_6
+      : io_pe_io_mm_rddata_6;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_7 =
+    _GEN_3 & _GEN_4 & addr_calc_main_7 == addr_calc_main_s4_7
+      ? s3_conv_7
+      : io_pe_io_mm_rddata_7;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire [7:0]      mempot_rd_main_8 =
+    _GEN_3 & _GEN_4 & addr_calc_main_8 == addr_calc_main_s4_8
+      ? s3_conv_8
+      : io_pe_io_mm_rddata_8;	// src/main/scala/tile/cu.scala:54:29, :60:36, :162:63, :190:22, :298:{45,64}, :299:{26,41}, :301:{40,66}, :302:39
+  wire            _GEN_5 = isNorth_s2 == isNorth_s4;	// src/main/scala/tile/cu.scala:79:29, :83:29, :307:25
+  wire            _GEN_6 = addr_calc_local_0 == addr_calc_local_s4_0;	// src/main/scala/tile/cu.scala:55:30, :61:37, :309:41
+  wire            _GEN_7 = addr_calc_local_1 == addr_calc_local_s4_1;	// src/main/scala/tile/cu.scala:55:30, :61:37, :309:41
+  wire            _GEN_8 = addr_calc_local_2 == addr_calc_local_s4_2;	// src/main/scala/tile/cu.scala:55:30, :61:37, :309:41
+  wire            _GEN_9 = isSouth_s2 == isSouth_s4;	// src/main/scala/tile/cu.scala:80:29, :84:29, :315:25
+  wire [3:0][7:0] _GEN_10 = {{s3_conv_3}, {s3_conv_0}, {s3_conv_6}, {s3_conv_3}};	// src/main/scala/tile/cu.scala:190:22, :319:40
+  wire [7:0]      mempot_rd_local_0 =
+    _GEN_3
+      ? (_GEN_9 & _GEN_6 ? _GEN_10[se_col[1:0]] : _GEN_5 & _GEN_6 ? s3_conv_6 : _GEN)
+      : _GEN;	// src/main/scala/tile/cu.scala:19:37, :162:63, :171:26, :179:26, :183:36, :190:22, :298:{45,64}, :307:{25,41}, :309:{41,68}, :310:40, :315:{25,41}, :317:68, :319:40
+  wire [3:0][7:0] _GEN_11 = {{s3_conv_4}, {s3_conv_1}, {s3_conv_7}, {s3_conv_4}};	// src/main/scala/tile/cu.scala:190:22, :319:40
+  wire [7:0]      mempot_rd_local_1 =
+    _GEN_3
+      ? (_GEN_9 & _GEN_7 ? _GEN_11[se_col[1:0]] : _GEN_5 & _GEN_7 ? s3_conv_7 : _GEN_0)
+      : _GEN_0;	// src/main/scala/tile/cu.scala:19:37, :162:63, :171:26, :179:26, :183:36, :190:22, :298:{45,64}, :307:{25,41}, :309:{41,68}, :310:40, :315:{25,41}, :317:68, :319:40
+  wire [3:0][7:0] _GEN_12 = {{s3_conv_5}, {s3_conv_2}, {s3_conv_8}, {s3_conv_5}};	// src/main/scala/tile/cu.scala:190:22, :319:40
+  wire [7:0]      mempot_rd_local_2 =
+    _GEN_3
+      ? (_GEN_9 & _GEN_8 ? _GEN_12[se_col[1:0]] : _GEN_5 & _GEN_8 ? s3_conv_8 : _GEN_1)
+      : _GEN_1;	// src/main/scala/tile/cu.scala:19:37, :162:63, :171:26, :179:26, :183:36, :190:22, :298:{45,64}, :307:{25,41}, :309:{41,68}, :310:40, :315:{25,41}, :317:68, :319:40
+  always @(posedge clock) begin	// src/main/scala/tile/cu.scala:10:7
+    automatic logic       _GEN_13;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_14;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_15;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_16;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_17;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_18;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_19;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_20;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_21;	// src/main/scala/IODefs.scala:121:31
+    automatic logic       _GEN_22;	// src/main/scala/tile/cu.scala:203:29
+    automatic logic       _GEN_23;	// src/main/scala/tile/cu.scala:246:39
+    automatic logic       _GEN_24;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic [3:0] _GEN_25;	// src/main/scala/tile/cu.scala:253:75
+    automatic logic       _GEN_26;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_27;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_28;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_29;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_30;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_31;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_32;	// src/main/scala/tile/cu.scala:240:29, :248:57, :253:83, :259:35
+    automatic logic       _GEN_33;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_34;	// src/main/scala/tile/cu.scala:240:29, :248:57, :253:83, :259:35
+    automatic logic       _GEN_35;	// src/main/scala/tile/cu.scala:253:32
+    automatic logic       _GEN_36;	// src/main/scala/tile/cu.scala:240:29, :248:57, :253:83, :259:35
+    _GEN_13 = input_idx_s2 == 4'h0;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:114:29, :149:31
+    _GEN_14 = input_idx_s2 == 4'h1;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:120:29, :149:31
+    _GEN_15 = input_idx_s2 == 4'h2;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:120:29, :149:31
+    _GEN_16 = input_idx_s2 == 4'h3;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_17 = input_idx_s2 == 4'h4;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_18 = input_idx_s2 == 4'h5;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_19 = input_idx_s2 == 4'h6;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_20 = input_idx_s2 == 4'h7;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_21 = input_idx_s2 == 4'h8;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:149:31
+    _GEN_22 = col_num_s3 == 4'h0;	// src/main/scala/tile/cu.scala:85:29, :114:29, :203:29
+    _GEN_23 = spike_valid_s3 & ~_aeqReadStage_io_conv_done & io_pe_io_conv_en;	// src/main/scala/tile/cu.scala:24:30, :42:33, :107:48, :246:39
+    _GEN_24 = _boundaryCheck_io_isSouth & _GEN_22;	// src/main/scala/tile/cu.scala:69:31, :203:29, :253:32
+    _GEN_25 = col_num_s3 + 4'h2;	// src/main/scala/tile/cu.scala:85:29, :120:29, :253:75
+    _GEN_26 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h2 & (|_GEN_25);	// src/main/scala/tile/cu.scala:69:31, :85:29, :120:29, :253:{32,40,61,75}
+    _GEN_27 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h3 & (|(_GEN_25[3:1]));	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_28 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h4 & _GEN_25 > 4'h2;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :120:29, :253:{32,40,61,75}
+    _GEN_29 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h5 & (|(_GEN_25[3:2]));	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_30 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h6 & _GEN_25 > 4'h4;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_31 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h7 & _GEN_25 > 4'h5;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_32 = _boundaryCheck_io_isNorth | _GEN_31;	// src/main/scala/tile/cu.scala:69:31, :240:29, :248:57, :253:{32,83}, :259:35
+    _GEN_33 = _boundaryCheck_io_isSouth & ~(col_num_s3[3]) & _GEN_25 > 4'h6;	// src/main/scala/IODefs.scala:121:31, src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_34 = _boundaryCheck_io_isNorth | _GEN_33;	// src/main/scala/tile/cu.scala:69:31, :240:29, :248:57, :253:{32,83}, :259:35
+    _GEN_35 = _boundaryCheck_io_isSouth & col_num_s3 < 4'h9 & _GEN_25[3];	// src/main/scala/tile/cu.scala:69:31, :85:29, :253:{32,40,61,75}
+    _GEN_36 = _boundaryCheck_io_isNorth | _GEN_35;	// src/main/scala/tile/cu.scala:69:31, :240:29, :248:57, :253:{32,83}, :259:35
+    if (reset) begin	// src/main/scala/tile/cu.scala:10:7
+      pipe_stall <= 1'h0;	// src/main/scala/tile/cu.scala:21:29
+      mempot_wr_main_valid_0 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_1 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_2 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_3 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_4 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_5 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_6 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_7 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_main_valid_8 <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :243:39
+      mempot_wr_local_valid <= 1'h0;	// src/main/scala/tile/cu.scala:21:29, :244:40
+    end
+    else begin	// src/main/scala/tile/cu.scala:10:7
+      pipe_stall <=
+        io_pe_io_conv_en & spike_valid_s3 & spike_valid_s2
+        & (addr_calc_main_0 == addr_calc_main_s3_0
+           | addr_calc_main_1 == addr_calc_main_s3_1
+           | addr_calc_main_2 == addr_calc_main_s3_2
+           | addr_calc_main_3 == addr_calc_main_s3_3
+           | addr_calc_main_4 == addr_calc_main_s3_4
+           | addr_calc_main_5 == addr_calc_main_s3_5
+           | addr_calc_main_6 == addr_calc_main_s3_6
+           | addr_calc_main_7 == addr_calc_main_s3_7
+           | addr_calc_main_8 == addr_calc_main_s3_8
+           | addr_calc_local_0 == addr_calc_local_s3_0
+           | addr_calc_local_1 == addr_calc_local_s3_1
+           | addr_calc_local_2 == addr_calc_local_s3_2);	// src/main/scala/tile/cu.scala:21:29, :41:33, :42:33, :54:29, :55:30, :57:36, :58:37, :325:64, :326:73, :327:75, :328:{20,34}, :330:20
+      mempot_wr_main_valid_0 <= _GEN_23 & (~_GEN_24 | mempot_wr_main_valid_0);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_1 <= _GEN_23 & (~_GEN_26 | mempot_wr_main_valid_1);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_2 <= _GEN_23 & (~_GEN_27 | mempot_wr_main_valid_2);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_3 <= _GEN_23 & (~_GEN_28 | mempot_wr_main_valid_3);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_4 <= _GEN_23 & (~_GEN_29 | mempot_wr_main_valid_4);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_5 <= _GEN_23 & (~_GEN_30 | mempot_wr_main_valid_5);	// src/main/scala/tile/cu.scala:243:39, :246:{39,60}, :248:57, :253:{32,83}, :260:41, :265:40
+      mempot_wr_main_valid_6 <= _GEN_23 & (~_GEN_32 | mempot_wr_main_valid_6);	// src/main/scala/tile/cu.scala:240:29, :243:39, :246:{39,60}, :248:57, :253:83, :259:35, :260:41, :265:40
+      mempot_wr_main_valid_7 <= _GEN_23 & (~_GEN_34 | mempot_wr_main_valid_7);	// src/main/scala/tile/cu.scala:240:29, :243:39, :246:{39,60}, :248:57, :253:83, :259:35, :260:41, :265:40
+      mempot_wr_main_valid_8 <= _GEN_23 & (~_GEN_36 | mempot_wr_main_valid_8);	// src/main/scala/tile/cu.scala:240:29, :243:39, :246:{39,60}, :248:57, :253:83, :259:35, :260:41, :265:40
+      mempot_wr_local_valid <=
+        _GEN_23
+        & (_boundaryCheck_io_isNorth | _GEN_35 | _GEN_33 | _GEN_31 | _GEN_30 | _GEN_29
+           | _GEN_28 | _GEN_27 | _GEN_26 | _GEN_24 | mempot_wr_local_valid);	// src/main/scala/tile/cu.scala:69:31, :244:40, :246:{39,60}, :248:57, :251:39, :253:{32,83}, :256:39, :264:31
+    end
+    spike_event_s1 <= _aeqReadStage_io_spike_event;	// src/main/scala/tile/cu.scala:24:30, :39:33
+    spike_valid_s1 <= _aeqReadStage_io_spike_valid;	// src/main/scala/tile/cu.scala:24:30, :40:33
+    spike_valid_s2 <= spike_valid_s1;	// src/main/scala/tile/cu.scala:40:33, :41:33
+    spike_valid_s3 <= spike_valid_s2;	// src/main/scala/tile/cu.scala:41:33, :42:33
+    spike_valid_s4 <= spike_valid_s3;	// src/main/scala/tile/cu.scala:42:33, :43:33
+    conv_done_s2 <= _aeqReadStage_io_conv_done;	// src/main/scala/tile/cu.scala:24:30, :45:31
+    conv_done_s3 <= conv_done_s2;	// src/main/scala/tile/cu.scala:45:31, :46:31
+    conv_done_s4 <= conv_done_s3;	// src/main/scala/tile/cu.scala:46:31, :47:31
+    addr_calc_main_0 <= {_addrCalc_io_new_i_0, _addrCalc_io_new_j_0};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_1 <= {_addrCalc_io_new_i_1, _addrCalc_io_new_j_1};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_2 <= {_addrCalc_io_new_i_2, _addrCalc_io_new_j_2};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_3 <= {_addrCalc_io_new_i_3, _addrCalc_io_new_j_3};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_4 <= {_addrCalc_io_new_i_4, _addrCalc_io_new_j_4};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_5 <= {_addrCalc_io_new_i_5, _addrCalc_io_new_j_5};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_6 <= {_addrCalc_io_new_i_6, _addrCalc_io_new_j_6};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_7 <= {_addrCalc_io_new_i_7, _addrCalc_io_new_j_7};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    addr_calc_main_8 <= {_addrCalc_io_new_i_8, _addrCalc_io_new_j_8};	// src/main/scala/tile/cu.scala:54:29, :97:26, :102:43
+    if (spike_valid_s1 & io_pe_io_conv_en & ~_aeqReadStage_io_conv_done) begin	// src/main/scala/tile/cu.scala:24:30, :40:33, :107:{45,48}
+      automatic logic [7:0] _GEN_37;	// src/main/scala/tile/cu.scala:114:29
+      automatic logic [7:0] _GEN_38;	// src/main/scala/tile/cu.scala:114:29
+      automatic logic [7:0] _GEN_39;	// src/main/scala/tile/cu.scala:114:29
+      _GEN_37 = {4'h0, addr_calc_main_0[3:0]};	// src/main/scala/tile/cu.scala:54:29, :114:{29,61}
+      _GEN_38 = {4'h0, addr_calc_main_1[3:0]};	// src/main/scala/tile/cu.scala:54:29, :114:{29,100}
+      _GEN_39 = {4'h0, addr_calc_main_2[3:0]};	// src/main/scala/tile/cu.scala:54:29, :114:{29,139}
+      if (_boundaryCheck_io_isNorth) begin	// src/main/scala/tile/cu.scala:69:31
+        addr_calc_local_0 <= _GEN_37;	// src/main/scala/tile/cu.scala:55:30, :114:29
+        addr_calc_local_1 <= _GEN_38;	// src/main/scala/tile/cu.scala:55:30, :114:29
+        addr_calc_local_2 <= _GEN_39;	// src/main/scala/tile/cu.scala:55:30, :114:29
+      end
+      else if (_boundaryCheck_io_isSouth) begin	// src/main/scala/tile/cu.scala:69:31
+        if (_boundaryCheck_io_col_out == 4'h0) begin	// src/main/scala/tile/cu.scala:69:31, :114:29, :120:29
+          addr_calc_local_0 <= {4'h0, addr_calc_main_3[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :125:{37,69}
+          addr_calc_local_1 <= {4'h0, addr_calc_main_4[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :125:{37,108}
+          addr_calc_local_2 <= {4'h0, addr_calc_main_5[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :125:{37,147}
+        end
+        else if (_boundaryCheck_io_col_out == 4'h1) begin	// src/main/scala/tile/cu.scala:69:31, :120:29
+          addr_calc_local_0 <= {4'h0, addr_calc_main_6[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :131:{37,69}
+          addr_calc_local_1 <= {4'h0, addr_calc_main_7[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :131:{37,108}
+          addr_calc_local_2 <= {4'h0, addr_calc_main_8[3:0]};	// src/main/scala/tile/cu.scala:54:29, :55:30, :114:29, :131:{37,147}
+        end
+        else if (_boundaryCheck_io_col_out == 4'h2) begin	// src/main/scala/tile/cu.scala:69:31, :120:29
+          addr_calc_local_0 <= _GEN_37;	// src/main/scala/tile/cu.scala:55:30, :114:29
+          addr_calc_local_1 <= _GEN_38;	// src/main/scala/tile/cu.scala:55:30, :114:29
+          addr_calc_local_2 <= _GEN_39;	// src/main/scala/tile/cu.scala:55:30, :114:29
+        end
+      end
+    end
+    addr_calc_main_s3_0 <= addr_calc_main_0;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_1 <= addr_calc_main_1;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_2 <= addr_calc_main_2;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_3 <= addr_calc_main_3;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_4 <= addr_calc_main_4;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_5 <= addr_calc_main_5;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_6 <= addr_calc_main_6;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_7 <= addr_calc_main_7;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_main_s3_8 <= addr_calc_main_8;	// src/main/scala/tile/cu.scala:54:29, :57:36
+    addr_calc_local_s3_0 <= addr_calc_local_0;	// src/main/scala/tile/cu.scala:55:30, :58:37
+    addr_calc_local_s3_1 <= addr_calc_local_1;	// src/main/scala/tile/cu.scala:55:30, :58:37
+    addr_calc_local_s3_2 <= addr_calc_local_2;	// src/main/scala/tile/cu.scala:55:30, :58:37
+    addr_calc_main_s4_0 <= addr_calc_main_s3_0;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_1 <= addr_calc_main_s3_1;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_2 <= addr_calc_main_s3_2;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_3 <= addr_calc_main_s3_3;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_4 <= addr_calc_main_s3_4;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_5 <= addr_calc_main_s3_5;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_6 <= addr_calc_main_s3_6;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_7 <= addr_calc_main_s3_7;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_main_s4_8 <= addr_calc_main_s3_8;	// src/main/scala/tile/cu.scala:57:36, :60:36
+    addr_calc_local_s4_0 <= addr_calc_local_s3_0;	// src/main/scala/tile/cu.scala:58:37, :61:37
+    addr_calc_local_s4_1 <= addr_calc_local_s3_1;	// src/main/scala/tile/cu.scala:58:37, :61:37
+    addr_calc_local_s4_2 <= addr_calc_local_s3_2;	// src/main/scala/tile/cu.scala:58:37, :61:37
+    isNorth_s2 <= _boundaryCheck_io_isNorth;	// src/main/scala/tile/cu.scala:69:31, :79:29
+    isSouth_s2 <= _boundaryCheck_io_isSouth;	// src/main/scala/tile/cu.scala:69:31, :80:29
+    isNorth_s3 <= isNorth_s2;	// src/main/scala/tile/cu.scala:79:29, :81:29
+    isSouth_s3 <= isSouth_s2;	// src/main/scala/tile/cu.scala:80:29, :82:29
+    isNorth_s4 <= isNorth_s3;	// src/main/scala/tile/cu.scala:81:29, :83:29
+    isSouth_s4 <= isSouth_s3;	// src/main/scala/tile/cu.scala:82:29, :84:29
+    col_num_s3_REG <= _boundaryCheck_io_col_out;	// src/main/scala/tile/cu.scala:69:31, :85:37
+    col_num_s3 <= col_num_s3_REG;	// src/main/scala/tile/cu.scala:85:{29,37}
+    input_idx_s2 <= _aeqReadStage_io_aeq_col_cnt;	// src/main/scala/tile/cu.scala:24:30, :149:31
+    kernel_s2_0 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_4
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_3
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_5
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_1
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_0
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_2
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_7
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_6
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_8 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_1 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_5
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_4
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_3
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_2
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_1
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_0
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_8
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_7
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_6 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_2 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_3
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_5
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_4
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_0
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_2
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_1
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_6
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_8
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_7 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_3 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_7
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_6
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_8
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_4
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_3
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_5
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_1
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_0
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_2 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_4 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_8
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_7
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_6
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_5
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_4
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_3
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_2
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_1
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_0 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_5 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_6
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_8
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_7
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_3
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_5
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_4
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_0
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_2
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_1 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_6 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_1
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_0
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_2
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_7
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_6
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_8
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_4
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_3
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_5 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_7 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_2
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_1
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_0
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_8
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_7
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_6
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_5
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_4
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_3 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    kernel_s2_8 <=
+      _GEN_13
+        ? io_pe_io_rotated_kernel_0
+        : _GEN_14
+            ? io_pe_io_rotated_kernel_2
+            : _GEN_15
+                ? io_pe_io_rotated_kernel_1
+                : _GEN_16
+                    ? io_pe_io_rotated_kernel_6
+                    : _GEN_17
+                        ? io_pe_io_rotated_kernel_8
+                        : _GEN_18
+                            ? io_pe_io_rotated_kernel_7
+                            : _GEN_19
+                                ? io_pe_io_rotated_kernel_3
+                                : _GEN_20
+                                    ? io_pe_io_rotated_kernel_5
+                                    : _GEN_21 ? io_pe_io_rotated_kernel_4 : 8'h0;	// src/main/scala/IODefs.scala:119:33, :121:31, :122:34, :126:34, :130:34, :134:34, :138:34, :142:34, :146:34, :150:34, :154:34, src/main/scala/tile/cu.scala:150:24
+    if (spike_valid_s3 & io_pe_io_conv_en & ~conv_done_s3) begin	// src/main/scala/tile/cu.scala:42:33, :46:31, :193:{45,47}
+      if (isNorth_s3) begin	// src/main/scala/tile/cu.scala:81:29
+        s3_conv_0 <= mempot_rd_main_0 + kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_1 <= mempot_rd_main_1 + kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_2 <= mempot_rd_main_2 + kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_3 <= mempot_rd_main_3 + kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_4 <= mempot_rd_main_4 + kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_5 <= mempot_rd_main_5 + kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :200:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_6 <= mempot_rd_local_0 + kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :196:54, :298:64, :315:41
+        s3_conv_7 <= mempot_rd_local_1 + kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :196:54, :298:64, :315:41
+        s3_conv_8 <= mempot_rd_local_2 + kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :196:54, :298:64, :315:41
+      end
+      else if (isSouth_s3) begin	// src/main/scala/tile/cu.scala:82:29
+        if (_GEN_22) begin	// src/main/scala/tile/cu.scala:203:29
+          s3_conv_0 <= mempot_rd_main_0 + kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :205:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_1 <= mempot_rd_main_1 + kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :205:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_2 <= mempot_rd_main_2 + kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :205:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_3 <= mempot_rd_local_0 + kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :209:58, :298:64, :315:41
+          s3_conv_4 <= mempot_rd_local_1 + kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :209:58, :298:64, :315:41
+          s3_conv_5 <= mempot_rd_local_2 + kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :209:58, :298:64, :315:41
+          s3_conv_6 <= mempot_rd_main_6 + kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :213:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_7 <= mempot_rd_main_7 + kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :213:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_8 <= mempot_rd_main_8 + kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :213:53, :298:64, :299:41, :301:66, :302:39
+        end
+        else if (col_num_s3 == 4'h1) begin	// src/main/scala/tile/cu.scala:85:29, :120:29, :215:35
+          s3_conv_0 <= mempot_rd_main_0 + kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_1 <= mempot_rd_main_1 + kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_2 <= mempot_rd_main_2 + kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_3 <= mempot_rd_main_3 + kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_4 <= mempot_rd_main_4 + kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_5 <= mempot_rd_main_5 + kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :217:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_6 <= mempot_rd_local_0 + kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :221:58, :298:64, :315:41
+          s3_conv_7 <= mempot_rd_local_1 + kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :221:58, :298:64, :315:41
+          s3_conv_8 <= mempot_rd_local_2 + kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :221:58, :298:64, :315:41
+        end
+        else begin	// src/main/scala/tile/cu.scala:215:35
+          s3_conv_0 <= mempot_rd_local_0 + kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :225:54, :298:64, :315:41
+          s3_conv_1 <= mempot_rd_local_1 + kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :225:54, :298:64, :315:41
+          s3_conv_2 <= mempot_rd_local_2 + kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :225:54, :298:64, :315:41
+          s3_conv_3 <= mempot_rd_main_3 + kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_4 <= mempot_rd_main_4 + kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_5 <= mempot_rd_main_5 + kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_6 <= mempot_rd_main_6 + kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_7 <= mempot_rd_main_7 + kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+          s3_conv_8 <= mempot_rd_main_8 + kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :229:53, :298:64, :299:41, :301:66, :302:39
+        end
+      end
+      else begin	// src/main/scala/tile/cu.scala:82:29
+        s3_conv_0 <= mempot_rd_main_0 + kernel_s2_0;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_1 <= mempot_rd_main_1 + kernel_s2_1;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_2 <= mempot_rd_main_2 + kernel_s2_2;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_3 <= mempot_rd_main_3 + kernel_s2_3;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_4 <= mempot_rd_main_4 + kernel_s2_4;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_5 <= mempot_rd_main_5 + kernel_s2_5;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_6 <= mempot_rd_main_6 + kernel_s2_6;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_7 <= mempot_rd_main_7 + kernel_s2_7;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+        s3_conv_8 <= mempot_rd_main_8 + kernel_s2_8;	// src/main/scala/tile/cu.scala:150:24, :162:63, :190:22, :235:49, :298:64, :299:41, :301:66, :302:39
+      end
+    end
+    if (~_GEN_23 | _GEN_24) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_0 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_26) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_1 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_27) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_2 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_28) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_3 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_29) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_4 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_30) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:32
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_5 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_32) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:83, :259:35
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_6 <= s3_conv_6;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_34) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:83, :259:35
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_7 <= s3_conv_7;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (~_GEN_23 | _GEN_36) begin	// src/main/scala/tile/cu.scala:240:29, :246:{39,60}, :248:57, :253:83, :259:35
+    end
+    else	// src/main/scala/tile/cu.scala:240:29, :246:60, :248:57
+      mempot_wr_main_8 <= s3_conv_8;	// src/main/scala/tile/cu.scala:190:22, :240:29
+    if (_GEN_23) begin	// src/main/scala/tile/cu.scala:246:39
+      automatic logic [1:0] local_idx_1;	// src/main/scala/tile/cu.scala:21:29, :254:38
+      automatic logic       _GEN_40;	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+      automatic logic       _GEN_41;	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_6;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_42;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic       _GEN_43;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_10;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_44;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic       _GEN_45;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_14;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_46;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic       _GEN_47;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_18;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_48;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic       _GEN_49;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_22;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_50;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic       _GEN_51;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_26;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_52;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_30;	// src/main/scala/tile/cu.scala:254:38
+      automatic logic       _GEN_53;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+      automatic logic [1:0] _local_idx_T_34;	// src/main/scala/tile/cu.scala:254:38
+      local_idx_1 = 2'h0 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :71:29, :85:29, :254:38
+      _GEN_40 = _GEN_24 & local_idx_1 == 2'h0;	// src/main/scala/tile/cu.scala:21:29, :71:29, :241:30, :253:{32,83}, :254:38, :255:44
+      _GEN_41 = _GEN_24 & local_idx_1 == 2'h1;	// src/main/scala/tile/cu.scala:21:29, :241:30, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_6 = 2'h1 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :250:44, :254:38
+      _GEN_42 = _GEN_26 & _local_idx_T_6 == 2'h0;	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+      _GEN_43 = _GEN_26 & _local_idx_T_6 == 2'h1;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_10 = 2'h2 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :120:29, :254:38
+      _GEN_44 = _GEN_27 & _local_idx_T_10 == 2'h0;	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+      _GEN_45 = _GEN_27 & _local_idx_T_10 == 2'h1;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_14 = 2'h3 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :254:38
+      _GEN_46 = _GEN_28 & _local_idx_T_14 == 2'h0;	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+      _GEN_47 = _GEN_28 & _local_idx_T_14 == 2'h1;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_18 = 2'h0 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :71:29, :85:29, :254:38
+      _GEN_48 = _GEN_29 & _local_idx_T_18 == 2'h0;	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+      _GEN_49 = _GEN_29 & _local_idx_T_18 == 2'h1;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_22 = 2'h1 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :250:44, :254:38
+      _GEN_50 = _GEN_30 & _local_idx_T_22 == 2'h0;	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+      _GEN_51 = _GEN_30 & _local_idx_T_22 == 2'h1;	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_26 = 2'h2 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :120:29, :254:38
+      _GEN_52 = _boundaryCheck_io_isNorth | _GEN_31 & _local_idx_T_26 == 2'h0;	// src/main/scala/tile/cu.scala:69:31, :71:29, :248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_30 = 2'h3 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :85:29, :254:38
+      _GEN_53 = _boundaryCheck_io_isNorth | _GEN_33 & _local_idx_T_30 == 2'h1;	// src/main/scala/tile/cu.scala:69:31, :248:57, :250:44, :253:{32,83}, :254:38, :255:44
+      _local_idx_T_34 = 2'h0 - col_num_s3[1:0];	// src/main/scala/tile/cu.scala:21:29, :71:29, :85:29, :254:38
+      if (_boundaryCheck_io_isNorth) begin	// src/main/scala/tile/cu.scala:69:31
+        if (_GEN_52)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_6;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_50)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_48)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_46)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_44)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_42)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_40)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        if (_GEN_53)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_7;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_51)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_49)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_47)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_45)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_43)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_41)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+      end
+      else begin	// src/main/scala/tile/cu.scala:69:31
+        if (_GEN_35 & _local_idx_T_34 == 2'h0)	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_0 <= s3_conv_8;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_33 & _local_idx_T_30 == 2'h0)	// src/main/scala/tile/cu.scala:71:29, :248:57, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_0 <= s3_conv_7;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_52)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_6;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_50)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_48)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_46)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_44)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_42)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_40)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+          mempot_wr_local_0 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        if (_GEN_35 & _local_idx_T_34 == 2'h1)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_1 <= s3_conv_8;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_53)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_7;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_31 & _local_idx_T_26 == 2'h1)	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_1 <= s3_conv_6;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_51)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_49)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_47)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_45)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_43)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_41)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+          mempot_wr_local_1 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+      end
+      if (_boundaryCheck_io_isNorth | _GEN_35 & _local_idx_T_34 == 2'h2)	// src/main/scala/tile/cu.scala:69:31, :120:29, :248:57, :250:44, :253:{32,83}, :254:38, :255:44
+        mempot_wr_local_2 <= s3_conv_8;	// src/main/scala/tile/cu.scala:190:22, :241:30
+      else begin	// src/main/scala/tile/cu.scala:248:57, :250:44, :253:83, :255:44
+        automatic logic _GEN_54;	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+        automatic logic _GEN_55;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+        automatic logic _GEN_56;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+        automatic logic _GEN_57;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+        automatic logic _GEN_58;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+        automatic logic _GEN_59;	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+        _GEN_54 = _GEN_24 & local_idx_1 == 2'h2;	// src/main/scala/tile/cu.scala:21:29, :120:29, :241:30, :253:{32,83}, :254:38, :255:44
+        _GEN_55 = _GEN_26 & _local_idx_T_6 == 2'h2;	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+        _GEN_56 = _GEN_27 & _local_idx_T_10 == 2'h2;	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+        _GEN_57 = _GEN_28 & _local_idx_T_14 == 2'h2;	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+        _GEN_58 = _GEN_29 & _local_idx_T_18 == 2'h2;	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+        _GEN_59 = _GEN_30 & _local_idx_T_22 == 2'h2;	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+        if (_boundaryCheck_io_isNorth) begin	// src/main/scala/tile/cu.scala:69:31
+          if (_GEN_59)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+          else if (_GEN_58)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+          else if (_GEN_57)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+          else if (_GEN_56)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+          else if (_GEN_55)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+          else if (_GEN_54)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+            mempot_wr_local_2 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        end
+        else if (_GEN_33 & _local_idx_T_30 == 2'h2)	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_2 <= s3_conv_7;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_31 & _local_idx_T_26 == 2'h2)	// src/main/scala/tile/cu.scala:120:29, :248:57, :253:{32,83}, :254:38, :255:44
+          mempot_wr_local_2 <= s3_conv_6;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_59)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_5;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_58)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_4;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_57)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_3;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_56)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_2;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_55)	// src/main/scala/tile/cu.scala:248:57, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_1;	// src/main/scala/tile/cu.scala:190:22, :241:30
+        else if (_GEN_54)	// src/main/scala/tile/cu.scala:241:30, :253:83, :255:44
+          mempot_wr_local_2 <= s3_conv_0;	// src/main/scala/tile/cu.scala:190:22, :241:30
+      end
+    end
+  end // always @(posedge)
+  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/tile/cu.scala:10:7
+    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/cu.scala:10:7
+      `FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/cu.scala:10:7
+    `endif // FIRRTL_BEFORE_INITIAL
+    initial begin	// src/main/scala/tile/cu.scala:10:7
+      automatic logic [31:0] _RANDOM[0:18];	// src/main/scala/tile/cu.scala:10:7
+      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/tile/cu.scala:10:7
+        `INIT_RANDOM_PROLOG_	// src/main/scala/tile/cu.scala:10:7
+      `endif // INIT_RANDOM_PROLOG_
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/tile/cu.scala:10:7
+        for (logic [4:0] i = 5'h0; i < 5'h13; i += 5'h1) begin
+          _RANDOM[i] = `RANDOM;	// src/main/scala/tile/cu.scala:10:7
+        end	// src/main/scala/tile/cu.scala:10:7
+        pipe_stall = _RANDOM[5'h0][0];	// src/main/scala/tile/cu.scala:10:7, :21:29
+        spike_event_s1 = _RANDOM[5'h0][10:1];	// src/main/scala/tile/cu.scala:10:7, :21:29, :39:33
+        spike_valid_s1 = _RANDOM[5'h0][11];	// src/main/scala/tile/cu.scala:10:7, :21:29, :40:33
+        spike_valid_s2 = _RANDOM[5'h0][12];	// src/main/scala/tile/cu.scala:10:7, :21:29, :41:33
+        spike_valid_s3 = _RANDOM[5'h0][13];	// src/main/scala/tile/cu.scala:10:7, :21:29, :42:33
+        spike_valid_s4 = _RANDOM[5'h0][14];	// src/main/scala/tile/cu.scala:10:7, :21:29, :43:33
+        conv_done_s2 = _RANDOM[5'h0][15];	// src/main/scala/tile/cu.scala:10:7, :21:29, :45:31
+        conv_done_s3 = _RANDOM[5'h0][16];	// src/main/scala/tile/cu.scala:10:7, :21:29, :46:31
+        conv_done_s4 = _RANDOM[5'h0][17];	// src/main/scala/tile/cu.scala:10:7, :21:29, :47:31
+        addr_calc_main_0 = _RANDOM[5'h0][25:18];	// src/main/scala/tile/cu.scala:10:7, :21:29, :54:29
+        addr_calc_main_1 = {_RANDOM[5'h0][31:26], _RANDOM[5'h1][1:0]};	// src/main/scala/tile/cu.scala:10:7, :21:29, :54:29
+        addr_calc_main_2 = _RANDOM[5'h1][9:2];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_3 = _RANDOM[5'h1][17:10];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_4 = _RANDOM[5'h1][25:18];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_5 = {_RANDOM[5'h1][31:26], _RANDOM[5'h2][1:0]};	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_6 = _RANDOM[5'h2][9:2];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_7 = _RANDOM[5'h2][17:10];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_main_8 = _RANDOM[5'h2][25:18];	// src/main/scala/tile/cu.scala:10:7, :54:29
+        addr_calc_local_0 = {_RANDOM[5'h2][31:26], _RANDOM[5'h3][1:0]};	// src/main/scala/tile/cu.scala:10:7, :54:29, :55:30
+        addr_calc_local_1 = _RANDOM[5'h3][9:2];	// src/main/scala/tile/cu.scala:10:7, :55:30
+        addr_calc_local_2 = _RANDOM[5'h3][17:10];	// src/main/scala/tile/cu.scala:10:7, :55:30
+        addr_calc_main_s3_0 = _RANDOM[5'h3][25:18];	// src/main/scala/tile/cu.scala:10:7, :55:30, :57:36
+        addr_calc_main_s3_1 = {_RANDOM[5'h3][31:26], _RANDOM[5'h4][1:0]};	// src/main/scala/tile/cu.scala:10:7, :55:30, :57:36
+        addr_calc_main_s3_2 = _RANDOM[5'h4][9:2];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_3 = _RANDOM[5'h4][17:10];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_4 = _RANDOM[5'h4][25:18];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_5 = {_RANDOM[5'h4][31:26], _RANDOM[5'h5][1:0]};	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_6 = _RANDOM[5'h5][9:2];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_7 = _RANDOM[5'h5][17:10];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_main_s3_8 = _RANDOM[5'h5][25:18];	// src/main/scala/tile/cu.scala:10:7, :57:36
+        addr_calc_local_s3_0 = {_RANDOM[5'h5][31:26], _RANDOM[5'h6][1:0]};	// src/main/scala/tile/cu.scala:10:7, :57:36, :58:37
+        addr_calc_local_s3_1 = _RANDOM[5'h6][9:2];	// src/main/scala/tile/cu.scala:10:7, :58:37
+        addr_calc_local_s3_2 = _RANDOM[5'h6][17:10];	// src/main/scala/tile/cu.scala:10:7, :58:37
+        addr_calc_main_s4_0 = _RANDOM[5'h6][25:18];	// src/main/scala/tile/cu.scala:10:7, :58:37, :60:36
+        addr_calc_main_s4_1 = {_RANDOM[5'h6][31:26], _RANDOM[5'h7][1:0]};	// src/main/scala/tile/cu.scala:10:7, :58:37, :60:36
+        addr_calc_main_s4_2 = _RANDOM[5'h7][9:2];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_3 = _RANDOM[5'h7][17:10];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_4 = _RANDOM[5'h7][25:18];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_5 = {_RANDOM[5'h7][31:26], _RANDOM[5'h8][1:0]};	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_6 = _RANDOM[5'h8][9:2];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_7 = _RANDOM[5'h8][17:10];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_main_s4_8 = _RANDOM[5'h8][25:18];	// src/main/scala/tile/cu.scala:10:7, :60:36
+        addr_calc_local_s4_0 = {_RANDOM[5'h8][31:26], _RANDOM[5'h9][1:0]};	// src/main/scala/tile/cu.scala:10:7, :60:36, :61:37
+        addr_calc_local_s4_1 = _RANDOM[5'h9][9:2];	// src/main/scala/tile/cu.scala:10:7, :61:37
+        addr_calc_local_s4_2 = _RANDOM[5'h9][17:10];	// src/main/scala/tile/cu.scala:10:7, :61:37
+        isNorth_s2 = _RANDOM[5'h9][18];	// src/main/scala/tile/cu.scala:10:7, :61:37, :79:29
+        isSouth_s2 = _RANDOM[5'h9][19];	// src/main/scala/tile/cu.scala:10:7, :61:37, :80:29
+        isNorth_s3 = _RANDOM[5'h9][20];	// src/main/scala/tile/cu.scala:10:7, :61:37, :81:29
+        isSouth_s3 = _RANDOM[5'h9][21];	// src/main/scala/tile/cu.scala:10:7, :61:37, :82:29
+        isNorth_s4 = _RANDOM[5'h9][22];	// src/main/scala/tile/cu.scala:10:7, :61:37, :83:29
+        isSouth_s4 = _RANDOM[5'h9][23];	// src/main/scala/tile/cu.scala:10:7, :61:37, :84:29
+        col_num_s3_REG = _RANDOM[5'h9][27:24];	// src/main/scala/tile/cu.scala:10:7, :61:37, :85:37
+        col_num_s3 = _RANDOM[5'h9][31:28];	// src/main/scala/tile/cu.scala:10:7, :61:37, :85:29
+        input_idx_s2 = _RANDOM[5'hA][17:14];	// src/main/scala/tile/cu.scala:10:7, :149:31
+        kernel_s2_0 = _RANDOM[5'hA][25:18];	// src/main/scala/tile/cu.scala:10:7, :149:31, :150:24
+        kernel_s2_1 = {_RANDOM[5'hA][31:26], _RANDOM[5'hB][1:0]};	// src/main/scala/tile/cu.scala:10:7, :149:31, :150:24
+        kernel_s2_2 = _RANDOM[5'hB][9:2];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_3 = _RANDOM[5'hB][17:10];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_4 = _RANDOM[5'hB][25:18];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_5 = {_RANDOM[5'hB][31:26], _RANDOM[5'hC][1:0]};	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_6 = _RANDOM[5'hC][9:2];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_7 = _RANDOM[5'hC][17:10];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        kernel_s2_8 = _RANDOM[5'hC][25:18];	// src/main/scala/tile/cu.scala:10:7, :150:24
+        s3_conv_0 = {_RANDOM[5'hC][31:27], _RANDOM[5'hD][2:0]};	// src/main/scala/tile/cu.scala:10:7, :150:24, :190:22
+        s3_conv_1 = _RANDOM[5'hD][10:3];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_2 = _RANDOM[5'hD][18:11];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_3 = _RANDOM[5'hD][26:19];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_4 = {_RANDOM[5'hD][31:27], _RANDOM[5'hE][2:0]};	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_5 = _RANDOM[5'hE][10:3];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_6 = _RANDOM[5'hE][18:11];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_7 = _RANDOM[5'hE][26:19];	// src/main/scala/tile/cu.scala:10:7, :190:22
+        s3_conv_8 = {_RANDOM[5'hE][31:27], _RANDOM[5'hF][2:0]};	// src/main/scala/tile/cu.scala:10:7, :190:22
+        mempot_wr_main_0 = _RANDOM[5'hF][11:4];	// src/main/scala/tile/cu.scala:10:7, :190:22, :240:29
+        mempot_wr_main_1 = _RANDOM[5'hF][19:12];	// src/main/scala/tile/cu.scala:10:7, :190:22, :240:29
+        mempot_wr_main_2 = _RANDOM[5'hF][27:20];	// src/main/scala/tile/cu.scala:10:7, :190:22, :240:29
+        mempot_wr_main_3 = {_RANDOM[5'hF][31:28], _RANDOM[5'h10][3:0]};	// src/main/scala/tile/cu.scala:10:7, :190:22, :240:29
+        mempot_wr_main_4 = _RANDOM[5'h10][11:4];	// src/main/scala/tile/cu.scala:10:7, :240:29
+        mempot_wr_main_5 = _RANDOM[5'h10][19:12];	// src/main/scala/tile/cu.scala:10:7, :240:29
+        mempot_wr_main_6 = _RANDOM[5'h10][27:20];	// src/main/scala/tile/cu.scala:10:7, :240:29
+        mempot_wr_main_7 = {_RANDOM[5'h10][31:28], _RANDOM[5'h11][3:0]};	// src/main/scala/tile/cu.scala:10:7, :240:29
+        mempot_wr_main_8 = _RANDOM[5'h11][11:4];	// src/main/scala/tile/cu.scala:10:7, :240:29
+        mempot_wr_local_0 = _RANDOM[5'h11][19:12];	// src/main/scala/tile/cu.scala:10:7, :240:29, :241:30
+        mempot_wr_local_1 = _RANDOM[5'h11][27:20];	// src/main/scala/tile/cu.scala:10:7, :240:29, :241:30
+        mempot_wr_local_2 = {_RANDOM[5'h11][31:28], _RANDOM[5'h12][3:0]};	// src/main/scala/tile/cu.scala:10:7, :240:29, :241:30
+        mempot_wr_main_valid_0 = _RANDOM[5'h12][4];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_1 = _RANDOM[5'h12][5];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_2 = _RANDOM[5'h12][6];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_3 = _RANDOM[5'h12][7];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_4 = _RANDOM[5'h12][8];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_5 = _RANDOM[5'h12][9];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_6 = _RANDOM[5'h12][10];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_7 = _RANDOM[5'h12][11];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_main_valid_8 = _RANDOM[5'h12][12];	// src/main/scala/tile/cu.scala:10:7, :241:30, :243:39
+        mempot_wr_local_valid = _RANDOM[5'h12][13];	// src/main/scala/tile/cu.scala:10:7, :241:30, :244:40
+      `endif // RANDOMIZE_REG_INIT
+    end // initial
+    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/tile/cu.scala:10:7
+      `FIRRTL_AFTER_INITIAL	// src/main/scala/tile/cu.scala:10:7
+    `endif // FIRRTL_AFTER_INITIAL
+  `endif // ENABLE_INITIAL_REG_
+  AeqReadStage aeqReadStage (	// src/main/scala/tile/cu.scala:24:30
     .clock          (clock),
     .reset          (reset),
-    .io_conv_en     (io_conv_en),
-    .io_conv_done   (io_conv_done),
-    .io_ai_rdaddr_0 (_aeqReadStage_io_ai_rdaddr_0),
-    .io_ai_rdaddr_1 (_aeqReadStage_io_ai_rdaddr_1),
-    .io_ai_rdaddr_2 (_aeqReadStage_io_ai_rdaddr_2),
-    .io_ai_rdaddr_3 (_aeqReadStage_io_ai_rdaddr_3),
-    .io_ai_rdaddr_4 (_aeqReadStage_io_ai_rdaddr_4),
-    .io_ai_rdaddr_5 (_aeqReadStage_io_ai_rdaddr_5),
-    .io_ai_rdaddr_6 (_aeqReadStage_io_ai_rdaddr_6),
-    .io_ai_rdaddr_7 (_aeqReadStage_io_ai_rdaddr_7),
-    .io_ai_rdaddr_8 (_aeqReadStage_io_ai_rdaddr_8),
-    .io_ai_rddata_0 (_tdpb_init_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_1 (_tdpb_init_1_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_2 (_tdpb_init_2_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_3 (_tdpb_init_3_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_4 (_tdpb_init_4_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_5 (_tdpb_init_5_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_6 (_tdpb_init_6_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_7 (_tdpb_init_7_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_ai_rddata_8 (_tdpb_init_8_doa),	// src/main/scala/tile_test/aeq.scala:103:31
-    .io_spike_event (io_spike_event),
-    .io_spike_valid (io_spike_valid),
-    .io_eoq_bit     (io_eoq_bit)
+    .io_conv_en     (io_pe_io_conv_en),
+    .io_pipe_stall  (pipe_stall),	// src/main/scala/tile/cu.scala:21:29
+    .io_conv_done   (_aeqReadStage_io_conv_done),
+    .io_ai_rdaddr_0 (io_pe_io_ai_rdaddr_0),
+    .io_ai_rdaddr_1 (io_pe_io_ai_rdaddr_1),
+    .io_ai_rdaddr_2 (io_pe_io_ai_rdaddr_2),
+    .io_ai_rdaddr_3 (io_pe_io_ai_rdaddr_3),
+    .io_ai_rdaddr_4 (io_pe_io_ai_rdaddr_4),
+    .io_ai_rdaddr_5 (io_pe_io_ai_rdaddr_5),
+    .io_ai_rdaddr_6 (io_pe_io_ai_rdaddr_6),
+    .io_ai_rdaddr_7 (io_pe_io_ai_rdaddr_7),
+    .io_ai_rdaddr_8 (io_pe_io_ai_rdaddr_8),
+    .io_ai_rddata_0 (io_pe_io_ai_rddata_0),
+    .io_ai_rddata_1 (io_pe_io_ai_rddata_1),
+    .io_ai_rddata_2 (io_pe_io_ai_rddata_2),
+    .io_ai_rddata_3 (io_pe_io_ai_rddata_3),
+    .io_ai_rddata_4 (io_pe_io_ai_rddata_4),
+    .io_ai_rddata_5 (io_pe_io_ai_rddata_5),
+    .io_ai_rddata_6 (io_pe_io_ai_rddata_6),
+    .io_ai_rddata_7 (io_pe_io_ai_rddata_7),
+    .io_ai_rddata_8 (io_pe_io_ai_rddata_8),
+    .io_aeq_col_cnt (_aeqReadStage_io_aeq_col_cnt),
+    .io_spike_event (_aeqReadStage_io_spike_event),
+    .io_spike_valid (_aeqReadStage_io_spike_valid)
   );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_0.mem")
-  ) tdpb_init (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_0),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_doa),
-    .dob   (/* unused */)
+  BoundaryCheck boundaryCheck (	// src/main/scala/tile/cu.scala:69:31
+    .io_i       (spike_event_s1[7:5]),	// src/main/scala/tile/cu.scala:39:33, :70:24
+    .io_se_blk  ({2'h0, _se_col_T / 8'h3}),	// src/main/scala/tile/cu.scala:18:{30,37}, :71:29
+    .io_se_col  ({8'h0, se_col[1:0]}),	// src/main/scala/IODefs.scala:119:33, src/main/scala/tile/cu.scala:19:37, :72:29
+    .io_col     (_aeqReadStage_io_aeq_col_cnt),	// src/main/scala/tile/cu.scala:24:30
+    .io_col_out (_boundaryCheck_io_col_out),
+    .io_isNorth (_boundaryCheck_io_isNorth),
+    .io_isSouth (_boundaryCheck_io_isSouth)
   );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_1.mem")
-  ) tdpb_init_1 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_1),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_1_doa),
-    .dob   (/* unused */)
+  AddrCalc addrCalc (	// src/main/scala/tile/cu.scala:97:26
+    .io_input_idx (_aeqReadStage_io_aeq_col_cnt),	// src/main/scala/tile/cu.scala:24:30
+    .io_i         (spike_event_s1[8:5]),	// src/main/scala/tile/cu.scala:39:33, :63:28
+    .io_j         (spike_event_s1[4:1]),	// src/main/scala/tile/cu.scala:39:33, :64:28
+    .io_new_i_0   (_addrCalc_io_new_i_0),
+    .io_new_i_1   (_addrCalc_io_new_i_1),
+    .io_new_i_2   (_addrCalc_io_new_i_2),
+    .io_new_i_3   (_addrCalc_io_new_i_3),
+    .io_new_i_4   (_addrCalc_io_new_i_4),
+    .io_new_i_5   (_addrCalc_io_new_i_5),
+    .io_new_i_6   (_addrCalc_io_new_i_6),
+    .io_new_i_7   (_addrCalc_io_new_i_7),
+    .io_new_i_8   (_addrCalc_io_new_i_8),
+    .io_new_j_0   (_addrCalc_io_new_j_0),
+    .io_new_j_1   (_addrCalc_io_new_j_1),
+    .io_new_j_2   (_addrCalc_io_new_j_2),
+    .io_new_j_3   (_addrCalc_io_new_j_3),
+    .io_new_j_4   (_addrCalc_io_new_j_4),
+    .io_new_j_5   (_addrCalc_io_new_j_5),
+    .io_new_j_6   (_addrCalc_io_new_j_6),
+    .io_new_j_7   (_addrCalc_io_new_j_7),
+    .io_new_j_8   (_addrCalc_io_new_j_8)
   );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_2.mem")
-  ) tdpb_init_2 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_2),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_2_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_3.mem")
-  ) tdpb_init_3 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_3),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_3_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_4.mem")
-  ) tdpb_init_4 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_4),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_4_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_5.mem")
-  ) tdpb_init_5 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_5),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_5_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_6.mem")
-  ) tdpb_init_6 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_6),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_6_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_7.mem")
-  ) tdpb_init_7 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_7),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_7_doa),
-    .dob   (/* unused */)
-  );
-  tdpb_init #(
-    .ADDR_WIDTH(10),
-    .DATA_WIDTH(10),
-    .INIT_FILE("ai_8.mem")
-  ) tdpb_init_8 (	// src/main/scala/tile_test/aeq.scala:103:31
-    .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:114:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .addra (_aeqReadStage_io_ai_rdaddr_8),	// src/main/scala/tile_test/aeq.scala:93:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:105:18
-    .doa   (_tdpb_init_8_doa),
-    .dob   (/* unused */)
-  );
+  assign io_pe_io_mm_rdaddr_0 = {2'h0, addr_calc_main_0};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_1 = {2'h0, addr_calc_main_1};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_2 = {2'h0, addr_calc_main_2};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_3 = {2'h0, addr_calc_main_3};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_4 = {2'h0, addr_calc_main_4};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_5 = {2'h0, addr_calc_main_5};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_6 = {2'h0, addr_calc_main_6};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_7 = {2'h0, addr_calc_main_7};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_rdaddr_8 = {2'h0, addr_calc_main_8};	// src/main/scala/tile/cu.scala:10:7, :54:29, :71:29, :166:39
+  assign io_pe_io_mm_wraddr_0 = {2'h0, addr_calc_main_s4_0};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_1 = {2'h0, addr_calc_main_s4_1};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_2 = {2'h0, addr_calc_main_s4_2};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_3 = {2'h0, addr_calc_main_s4_3};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_4 = {2'h0, addr_calc_main_s4_4};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_5 = {2'h0, addr_calc_main_s4_5};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_6 = {2'h0, addr_calc_main_s4_6};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_7 = {2'h0, addr_calc_main_s4_7};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wraddr_8 = {2'h0, addr_calc_main_s4_8};	// src/main/scala/tile/cu.scala:10:7, :60:36, :71:29, :272:35
+  assign io_pe_io_mm_wrdata_0 = mempot_wr_main_0;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_1 = mempot_wr_main_1;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_2 = mempot_wr_main_2;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_3 = mempot_wr_main_3;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_4 = mempot_wr_main_4;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_5 = mempot_wr_main_5;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_6 = mempot_wr_main_6;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_7 = mempot_wr_main_7;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_wrdata_8 = mempot_wr_main_8;	// src/main/scala/tile/cu.scala:10:7, :240:29
+  assign io_pe_io_mm_we_0 = _GEN_2 & mempot_wr_main_valid_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_1 = _GEN_2 & mempot_wr_main_valid_1;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_2 = _GEN_2 & mempot_wr_main_valid_2;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_3 = _GEN_2 & mempot_wr_main_valid_3;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_4 = _GEN_2 & mempot_wr_main_valid_4;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_5 = _GEN_2 & mempot_wr_main_valid_5;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_6 = _GEN_2 & mempot_wr_main_valid_6;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_7 = _GEN_2 & mempot_wr_main_valid_7;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_mm_we_8 = _GEN_2 & mempot_wr_main_valid_8;	// src/main/scala/tile/cu.scala:10:7, :162:63, :243:39, :269:{45,63}, :271:31
+  assign io_pe_io_ln2_rdaddr_0 = io_pe_io_ls2_rdaddr_0_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ln2_rdaddr_1 = io_pe_io_ls2_rdaddr_1_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ln2_rdaddr_2 = io_pe_io_ls2_rdaddr_2_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ln2_wraddr_0 = io_pe_io_ls2_wraddr_0_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ln2_wraddr_1 = io_pe_io_ls2_wraddr_1_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ln2_wraddr_2 = io_pe_io_ls2_wraddr_2_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ln2_wrdata_0 = mempot_wr_local_0;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ln2_wrdata_1 = mempot_wr_local_1;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ln2_wrdata_2 = mempot_wr_local_2;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ln2_we_0 = io_pe_io_ln2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26, :279:36
+  assign io_pe_io_ln2_we_1 = io_pe_io_ln2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26, :279:36
+  assign io_pe_io_ln2_we_2 = io_pe_io_ln2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26, :279:36
+  assign io_pe_io_ls2_rdaddr_0 = io_pe_io_ls2_rdaddr_0_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ls2_rdaddr_1 = io_pe_io_ls2_rdaddr_1_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ls2_rdaddr_2 = io_pe_io_ls2_rdaddr_2_0;	// src/main/scala/tile/cu.scala:10:7, :174:40
+  assign io_pe_io_ls2_wraddr_0 = io_pe_io_ls2_wraddr_0_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ls2_wraddr_1 = io_pe_io_ls2_wraddr_1_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ls2_wraddr_2 = io_pe_io_ls2_wraddr_2_0;	// src/main/scala/tile/cu.scala:10:7, :278:40
+  assign io_pe_io_ls2_wrdata_0 = mempot_wr_local_0;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ls2_wrdata_1 = mempot_wr_local_1;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ls2_wrdata_2 = mempot_wr_local_2;	// src/main/scala/tile/cu.scala:10:7, :241:30
+  assign io_pe_io_ls2_we_0 = io_pe_io_ls2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26
+  assign io_pe_io_ls2_we_1 = io_pe_io_ls2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26
+  assign io_pe_io_ls2_we_2 = io_pe_io_ls2_we_2_0;	// src/main/scala/tile/cu.scala:10:7, :162:63, :269:63, :276:26
+  assign io_pe_io_conv_done = conv_done_s4;	// src/main/scala/tile/cu.scala:10:7, :47:31
 endmodule
 
-
-// ----- 8< ----- FILE "./tdpb_init.v" ----- 8< -----
-
-module tdpb_init #(
-    parameter DATA_WIDTH = 16,
-    parameter ADDR_WIDTH = 10,
-    parameter INIT_FILE = ""
-)(
-    input                        clka, clkb,
-    input                        ena, enb,
-    input                        wea, web,
-    input      [ADDR_WIDTH-1:0]  addra, addrb,
-    input      [DATA_WIDTH-1:0]  dia, dib,
-    output reg [DATA_WIDTH-1:0]  doa, dob
-);
-
-    reg [DATA_WIDTH-1:0] ram [(2**ADDR_WIDTH)-1:0];
-
-    // Initialization block
-    initial begin
-        if (INIT_FILE != "") begin
-            $readmemh(INIT_FILE, ram);
-        end
-    end
-
-    always @(posedge clka) begin
-        if (ena) begin
-            if (wea)
-                ram[addra] <= dia;
-            doa <= ram[addra];
-        end
-    end
-
-    always @(posedge clkb) begin
-        if (enb) begin
-            if (web)
-                ram[addrb] <= dib;
-            dob <= ram[addrb];
-        end
-    end
-
-endmodule
-
-// ----- 8< ----- FILE "firrtl_black_box_resource_files.f" ----- 8< -----
-
-tdpb_init.v

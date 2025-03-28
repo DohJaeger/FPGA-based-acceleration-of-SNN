@@ -78,6 +78,21 @@ import java.io.{File, PrintWriter, BufferedWriter, FileWriter}
         val thresh_done = Output(Bool())
     }
 
+    class LU_IO(num_col: Int, aeq_depth: Int, aeq_width: Int, wm_depth: Int, bias_width: Int, wm_width: Int, tot_blk_width: Int) extends Bundle {
+
+        val ai_rdaddr = Output(Vec(9, UInt(log2Ceil(aeq_depth).W)))
+        val ai_rddata = Input(Vec(9, UInt(aeq_width.W)))
+
+        val wm_rdaddr = Output(Vec(10, UInt(log2Ceil(wm_depth).W)))
+        val wm_rddata = Input(Vec(10, UInt(wm_width.W)))
+
+        val tot_blk = Input(UInt(tot_blk_width.W))
+        val tot_hor_blk = Input(UInt(tot_blk_width.W))
+
+        val lin_en = Input(Bool())
+        val lin_done = Output(Bool())
+    }
+
     object NetworkUtils {
         def initCUIO(io: CU_IO, num_col: Int): Unit = {
             io.mm_rdaddr := DontCare
@@ -111,6 +126,12 @@ import java.io.{File, PrintWriter, BufferedWriter, FileWriter}
             io.ao_we := DontCare
 
             io.thresh_done := DontCare
+        }
+
+        def initLUIO(io: LU_IO, num_col: Int): Unit = {
+            io.ai_rdaddr := DontCare
+            io.wm_rdaddr := DontCare
+            io.lin_done := DontCare
         }
     }
 

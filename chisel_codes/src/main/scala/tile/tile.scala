@@ -45,7 +45,7 @@ class tile(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, a
 
 	val ai  = Array.fill(9)(null: tdpb_init)
 	val ao  = Array.fill(9)(null: tdpb_init)
-	val mm  = Array.fill(9)(null: tdpb)
+	val mm  = Array.fill(9)(null: tdpb_init)
 	val ln1 = Array.fill(3)(null: tdpb)
 	val ls1 = Array.fill(3)(null: tdpb)
 
@@ -53,7 +53,9 @@ class tile(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, a
 	for (i <- 0 until 9) {
 		ai(i) = Module(new tdpb_init(10, 10, s"ai_$i.mem"))
 		ao(i) = Module(new tdpb_init(10, 10, s"ao_$i.mem"))
-		mm(i) = Module(new tdpb(9, 10))
+		// mm(i) = Module(new tdpb(9, 10))
+
+        mm(i) = Module(new tdpb_init(8, 10, s"mm_$i.mem"))
 
         ai(i).io := DontCare
         ao(i).io := DontCare
@@ -84,20 +86,23 @@ class tile(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, a
 
     // === Main Mem Connections ===
     for (i <- 0 until 9) {
-        // Shared for CU and TU (read/write)
+        // Shared for CU and TU (read/write) read port -> a, portb write
         mm(i).io.clka := clock
         mm(i).io.clkb := clock
         mm(i).io.ena := true.B
         mm(i).io.enb := true.B
-        mm(i).io.wea := cu.io.pe_io.mm_we(i)
-        mm(i).io.web := false.B // TU only reads
-        mm(i).io.addra := Mux(cu.io.pe_io.mm_we(i), cu.io.pe_io.mm_wraddr(i), cu.io.pe_io.mm_rdaddr(i))
-        mm(i).io.dia := cu.io.pe_io.mm_wrdata(i)
 
-        mm(i).io.addrb := tu.io.tu_io.mm_rdaddr(i)
-        mm(i).io.dib := 0.U
-        cu.io.pe_io.mm_rddata(i) := mm(i).io.doa
-        tu.io.tu_io.mm_rddata(i) := mm(i).io.dob
+        mm(i).io.wea := false.B
+        // mm(i).io.addra := Mux(io.conv_en, cu.io.pe_io.mm_rdaddr(i), Mux(io.thresh_en, tu.io.tu_io.mm_rdaddr(i), 0.U))
+        mm(i).io.addra := tu.io.tu_io.mm_rdaddr(i)
+        mm(i).io.dia := 0.U
+        
+        mm(i).io.web := cu.io.pe_io.mm_we(i)
+        mm(i).io.dib := cu.io.pe_io.mm_wrdata(i)
+        mm(i).io.addrb := cu.io.pe_io.mm_wraddr(i)
+
+        cu.io.pe_io.mm_rddata(i) := Mux(io.conv_en, mm(i).io.doa, 0.U)
+        tu.io.tu_io.mm_rddata(i) := Mux(io.thresh_en, mm(i).io.doa, 0.U)
     }
 
     // === Local North Mem ===
@@ -106,11 +111,13 @@ class tile(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, a
         ln1(i).io.clkb := clock
         ln1(i).io.ena := true.B
         ln1(i).io.enb := true.B
+
         ln1(i).io.wea := false.B // CU only reads
-        ln1(i).io.web := false.B // TU only reads
         ln1(i).io.addra := tu.io.tu_io.ln1_rdaddr(i)
-        ln1(i).io.addrb := DontCare
         ln1(i).io.dia := 0.U
+        
+        ln1(i).io.web := false.B // TU only reads
+        ln1(i).io.addrb := DontCare
         ln1(i).io.dib := 0.U
         tu.io.tu_io.ln1_rddata(i) := ln1(i).io.doa
 

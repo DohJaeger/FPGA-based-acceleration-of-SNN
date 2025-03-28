@@ -22,12 +22,13 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
     // ==== Stage 0: Read AEQ ====
     val aeqReadStage = Module(new AeqReadStage(aeq_depth, aeq_width))
-    
+
     aeqReadStage.io.conv_en := io.pe_io.conv_en
     val conv_done = aeqReadStage.io.conv_done
 
     io.pe_io.ai_rdaddr := aeqReadStage.io.ai_rdaddr
     aeqReadStage.io.ai_rddata := io.pe_io.ai_rddata
+    aeqReadStage.io.pipe_stall := pipe_stall
 
     val spike_event = aeqReadStage.io.spike_event
     val spike_valid = aeqReadStage.io.spike_valid
@@ -37,6 +38,9 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
     val spike_event_s1 = RegNext(spike_event)
     val spike_valid_s1 = RegNext(spike_valid)
+    val spike_valid_s2 = RegNext(spike_valid_s1)
+    val spike_valid_s3 = RegNext(spike_valid_s2)
+    val spike_valid_s4 = RegNext(spike_valid_s3)
 
     val conv_done_s2 = RegNext(conv_done)
     val conv_done_s3 = RegNext(conv_done_s2)
@@ -48,7 +52,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     val j_in = Wire(UInt((aeq_width/2 - 1).W))
 
     val addr_calc_main = Reg(Vec(9, UInt((aeq_width - 2).W))) // s2
-    val addr_calc_local = Reg(Vec(3, UInt((aeq_width - 2).W)))
+    val addr_calc_local = Reg(Vec(3, UInt((aeq_width/2 - 1).W)))
 
     val addr_calc_main_s3 = RegNext(addr_calc_main)
     val addr_calc_local_s3 = RegNext(addr_calc_local)
@@ -107,7 +111,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
             main_valid(6) := false.B
             main_valid(7) := false.B
             main_valid(8) := false.B
-            addr_calc_local := VecInit(Seq(addr_calc_main(0)(aeq_width/2 - 2, 0), addr_calc_main(1)(aeq_width/2 - 2, 0), addr_calc_main(2)(aeq_width/2 - 2, 0)))
+            addr_calc_local := VecInit(Seq(addr_calc_main(6)(aeq_width/2 - 2, 0), addr_calc_main(7)(aeq_width/2 - 2, 0), addr_calc_main(8)(aeq_width/2 - 2, 0)))
 
         }.elsewhen(isSouth) {
             local_valid := true.B
@@ -136,37 +140,42 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
         }.otherwise {
             local_valid := false.B
-            main_valid := VecInit(Seq.fill(9)(true.B))
+            for (i <- 0 until 9){
+                main_valid(i) := true.B
+            }
         }
     }
 
 
     // ==== stage - 2: mempot read ====
+    val i_max = (io.pe_io.N - 1.U)/3.U
+    val j_max = (io.pe_io.T - 1.U)/3.U
+
     val input_idx_s2 = RegNext(input_idx)
     val kernel_s2 = Reg(Vec(9, UInt(kernel_width.W)))
 
     kernel_s2 := KernelUtils.selectKernel(input_idx_s2, io.pe_io.rotated_kernel)
         
-    val mempot_rd_main = Wire(Vec(9, UInt(mempot_width.W)))
-    val mempot_rd_local = Wire(Vec(3, UInt(mempot_width.W)))
+    val mempot_rd_main = Reg(Vec(9, UInt(mempot_width.W)))
+    val mempot_rd_local = Reg(Vec(3, UInt(mempot_width.W)))
 
     mempot_rd_main.foreach(_ := DontCare)
     mempot_rd_local.foreach(_ := DontCare)
 
     val s2_valid = RegInit(false.B)
 
-    when(io.pe_io.conv_en && !conv_done_s2) {
+    when(spike_valid_s2 && io.pe_io.conv_en && !conv_done_s2) {
         for (i <- 0 until 9) {
             when(main_valid(i)) {
-                io.pe_io.mm_we(i) := false.B
-                io.pe_io.mm_rdaddr(i) := addr_calc_main(i)
+                // io.pe_io.mm_we(i) := false.B
+                io.pe_io.mm_rdaddr(i) := (addr_calc_main(i)(aeq_width - 3, aeq_width/2 - 1)) * j_max + (addr_calc_main(i)(aeq_width/2 - 2, 0))
                 mempot_rd_main(i) := io.pe_io.mm_rddata(i)
             }
         }
 
         when(isNorth_s2) {
             for (i <- 0 until 3) {
-                io.pe_io.ln2_we(i) := false.B
+                // io.pe_io.ln2_we(i) := false.B
                 io.pe_io.ln2_rdaddr(i) := addr_calc_local(i)
                 mempot_rd_local(i) := io.pe_io.ln2_rddata(i)
             }
@@ -174,7 +183,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
         when(isSouth_s2) {
             for (i <- 0 until 3) {
-                io.pe_io.ls2_we(i) := false.B
+                // io.pe_io.ls2_we(i) := false.B
                 io.pe_io.ls2_rdaddr(i) := addr_calc_local(i)
                 mempot_rd_local(i) := io.pe_io.ls2_rddata(i)
             }
@@ -186,7 +195,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     val s3_conv = Reg(Vec(num_col, UInt(mempot_width.W)))
     val s3_valid = Reg(Bool())
 
-    when(io.pe_io.conv_en & !conv_done_s3) {
+    when(spike_valid_s3 && io.pe_io.conv_en & !conv_done_s3) {
         when(isNorth_s3) {
             for (i <- 6 until 9) {
                 s3_conv(i) := mempot_rd_local(i - 6) + kernel_s2(i)
@@ -239,7 +248,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     val mempot_wr_main_valid = RegInit(VecInit(Seq.fill(9)(false.B)))
     val mempot_wr_local_valid = RegInit(false.B)
 
-    when(!conv_done && io.pe_io.conv_en) {
+    when(spike_valid_s3 && !conv_done_s3 && io.pe_io.conv_en) {
         for (i <- 0 until 9) {
             when(isNorth && (i.U >= 6.U && i.U <= 8.U)) {
                 val local_idx = (i.U - 6.U)(1, 0)
@@ -259,7 +268,7 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
     }
 
     // ==== Stage-4: Write Back to MemPot ====
-    when(io.pe_io.conv_en && !conv_done_s4) {
+    when(spike_valid_s4 && io.pe_io.conv_en && !conv_done_s4) {
         for (i <- 0 until 9) {
             io.pe_io.mm_we(i) := mempot_wr_main_valid(i)
             io.pe_io.mm_wraddr(i) := addr_calc_main_s4(i)
@@ -269,13 +278,13 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
         when(isNorth_s4) {
             for (i <- 0 until 3) {
                 io.pe_io.ln2_wraddr(i) := addr_calc_local_s4(i)
-                io.pe_io.ln2_we(i) := true.B
+                io.pe_io.ln2_we(i) := mempot_wr_local_valid
                 io.pe_io.ln2_wrdata(i) := mempot_wr_local(i)
             }
         }.elsewhen(isSouth_s4){
             for (i <- 0 until 3) {
                 io.pe_io.ls2_wraddr(i) := addr_calc_local_s4(i)
-                io.pe_io.ls2_we(i) := true.B
+                io.pe_io.ls2_we(i) := mempot_wr_local_valid
                 io.pe_io.ls2_wrdata(i) := mempot_wr_local(i)
             }
         }
@@ -283,63 +292,47 @@ class cu(num_col: Int, mempot_width: Int, mempot_depth: Int, aeq_width: Int, aeq
 
     // --- pipeline data hazards mitigation ---
 
-    val forward_enable = Wire(Vec(9, Bool()))
-    val forward_data = Wire(Vec(9, UInt(mempot_width.W)))
-    forward_enable.foreach(_ := DontCare)
-    forward_data.foreach(_ := DontCare)
+    // val forward_enable = Wire(Vec(9, Bool()))
+    // val forward_data = Wire(Vec(9, UInt(mempot_width.W)))
+    // forward_enable.foreach(_ := DontCare)
+    // forward_data.foreach(_ := DontCare)
 
-    when(io.pe_io.conv_en) {
-        // Case 1: No boundary spike -> Only compare main memory
-        when(!isNorth_s2 & !isSouth_s2) {
-            for (i <- 0 until 9) {
-                when(addr_calc_main(i) === addr_calc_main_s4(i)) {
-                    mempot_rd_main(i) := s3_conv(i) // Forward result from S4
-                }
-            }
-        }
+    // when(io.pe_io.conv_en && spike_valid_s4 && spike_valid_s2) {
+    //     when(!isNorth_s2 & !isSouth_s2) {
+    //         for (i <- 0 until 9) {
+    //             when(addr_calc_main(i) === addr_calc_main_s4(i)) {
+    //                 mempot_rd_main(i) := s3_conv(i)
+    //             }
+    //         }
+    //     }
 
-        // Case 2: North boundary -> Compare local memory
-        when(isNorth_s2 === isNorth_s4) {
-            for (i <- 0 until 3) {
-                when(addr_calc_local(i) === addr_calc_local_s4(i)) {
-                    mempot_rd_local(i) := s3_conv(i + 6) // Forward from corresponding S4 index
-                }
-            }
-        }
+    //     when(isNorth_s2 === isNorth_s4) {
+    //         for (i <- 0 until 3) {
+    //             when(addr_calc_local(i) === addr_calc_local_s4(i)) {
+    //                 mempot_rd_local(i) := s3_conv(i + 6)
+    //             }
+    //         }
+    //     }
 
-        // Case 3: South boundary -> Compare local memory with `se_col` handling
-        when(isSouth_s2 === isSouth_s4) {
-            for (i <- 0 until 3) {
-                when(addr_calc_local(i) === addr_calc_local_s4(i)) {
-                    val sel_vec = VecInit(Seq(s3_conv(i + 3), s3_conv(i + 6), s3_conv(i)))
-                    mempot_rd_local(i) := sel_vec(se_col)
-                }
-            }
-        }
+    //     when(isSouth_s2 === isSouth_s4) {
+    //         for (i <- 0 until 3) {
+    //             when(addr_calc_local(i) === addr_calc_local_s4(i)) {
+    //                 val sel_vec = VecInit(Seq(s3_conv(i + 3), s3_conv(i + 6), s3_conv(i)))
+    //                 mempot_rd_local(i) := sel_vec(se_col)
+    //             }
+    //         }
+    //     }
+    // }
 
-        // Case 4: Overlap in Main Memory (For Boundary Conditions)
-        for (i <- 0 until 9) {
-            when(addr_calc_main(i) === addr_calc_main_s4(i)) {
-                mempot_rd_main(i) := s3_conv(i) // Forward result from S4
-            }
-        }
-    }
+    // when(io.pe_io.conv_en && spike_valid_s3 && spike_valid_s2) {
+    //     val stall_main = VecInit((0 until 9).map(i => addr_calc_main(i) === addr_calc_main_s3(i))).reduce(_ || _)
+    //     val stall_local = VecInit((0 until 3).map(i => addr_calc_local(i) === addr_calc_local_s3(i))).reduce(_ || _)
+    //     pipe_stall := stall_main || stall_local
+    // }.otherwise {
+    //     pipe_stall := false.B
+    // }
 
-    when(io.pe_io.conv_en) {
-        // Check for S2-S3 hazard in Main Memory
-        for (i <- 0 until 9) {
-            when(addr_calc_main(i) === addr_calc_main_s3(i)) {
-                pipe_stall := true.B  // Stall pipeline if addresses match
-            }
-        }
-
-        // Check for S2-S3 hazard in Local Memory
-        for (i <- 0 until 3) {
-            when(addr_calc_local(i) === addr_calc_local_s3(i)) {
-                pipe_stall := true.B  // Stall pipeline if addresses match
-            }
-        }
-    }
+    pipe_stall := false.B
 
 }
 

@@ -8,6 +8,7 @@ import IO_DEFS.{NetworkUtils, KernelUtils}
 
 class AeqReadStageIO(aeq_depth: Int, aeq_width: Int) extends Bundle {
     val conv_en = Input(Bool())
+    val pipe_stall = Input(Bool())
     val conv_done = Output(Bool())
 
     val ai_rdaddr = Output(Vec(9, UInt(log2Ceil(aeq_depth).W)))
@@ -70,10 +71,18 @@ class AeqReadStage(aeq_depth: Int, aeq_width: Int) extends Module {
                 conv_done_reg := true.B
                 aeq_read_col_sel_counter := 0.U
             }.otherwise {
-                aeq_read_col_sel_counter := aeq_read_col_sel_counter + 1.U
+                when(!io.pipe_stall){
+                    aeq_read_col_sel_counter := aeq_read_col_sel_counter + 1.U
+                }.otherwise{
+                    aeq_read_col_sel_counter := aeq_read_col_sel_counter
+                }
             }
         }.elsewhen(spike_valid) {
-            aeq_read_addr := aeq_read_addr + 1.U
+            when(!io.pipe_stall){
+                aeq_read_addr := aeq_read_addr + 1.U
+            }.otherwise{
+                aeq_read_addr := aeq_read_addr
+            }
         }
     }.otherwise {
         aeq_read_col_sel_counter := 0.U
@@ -85,6 +94,7 @@ class AeqReadStage(aeq_depth: Int, aeq_width: Int) extends Module {
 class TopLevelModule(aeq_depth: Int, aeq_width: Int) extends Module {
     val io = IO(new Bundle {
         val conv_en = Input(Bool())
+        val pipe_stall = Input(Bool())
         val conv_done = Output(Bool())
         val spike_event = Output(UInt(aeq_width.W))
         val spike_valid = Output(Bool())
@@ -93,8 +103,10 @@ class TopLevelModule(aeq_depth: Int, aeq_width: Int) extends Module {
 
     // Instantiate AEQ Read Stage
     val aeqReadStage = Module(new AeqReadStage(aeq_depth, aeq_width))
+
     aeqReadStage.io.conv_en := io.conv_en
     io.conv_done := aeqReadStage.io.conv_done
+
     io.spike_event := aeqReadStage.io.spike_event
     io.spike_valid := aeqReadStage.io.spike_valid
     // io.eoq_bit := aeqReadStage.io.eoq_bit
@@ -110,6 +122,9 @@ class TopLevelModule(aeq_depth: Int, aeq_width: Int) extends Module {
     val ai_rdaddr = aeqReadStage.io.ai_rdaddr
     val ai_rddata_vec = Wire(Vec(9, UInt(aeq_width.W)))
 
+    val aeq_col_cnt = aeqReadStage.io.aeq_col_cnt
+
+
     for (i <- 0 until 9) {
         ai(i).io.clka := clock
         ai(i).io.ena := true.B
@@ -120,6 +135,7 @@ class TopLevelModule(aeq_depth: Int, aeq_width: Int) extends Module {
     }
 
     aeqReadStage.io.ai_rddata := ai_rddata_vec
+    aeqReadStage.io.pipe_stall := io.pipe_stall
 }
 
 

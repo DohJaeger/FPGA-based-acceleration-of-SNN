@@ -50,62 +50,60 @@
   `endif // not def ENABLE_INITIAL_MEM_
 `endif // not def SYNTHESIS
 
-module AeqReadStage(	// src/main/scala/tile_test/aeq.scala:22:7
-  input        clock,	// src/main/scala/tile_test/aeq.scala:22:7
-               reset,	// src/main/scala/tile_test/aeq.scala:22:7
-               io_conv_en,	// src/main/scala/tile_test/aeq.scala:23:16
-  output       io_conv_done,	// src/main/scala/tile_test/aeq.scala:23:16
-  output [9:0] io_ai_rdaddr_0,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_1,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_2,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_3,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_4,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_5,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_6,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_7,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rdaddr_8,	// src/main/scala/tile_test/aeq.scala:23:16
-  input  [9:0] io_ai_rddata_0,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_1,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_2,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_3,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_4,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_5,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_6,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_7,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_ai_rddata_8,	// src/main/scala/tile_test/aeq.scala:23:16
-  output [9:0] io_spike_event,	// src/main/scala/tile_test/aeq.scala:23:16
-  output       io_spike_valid,	// src/main/scala/tile_test/aeq.scala:23:16
-               io_eoq_bit	// src/main/scala/tile_test/aeq.scala:23:16
+module AeqReadStage(	// src/main/scala/tile/aeq.scala:23:7
+  input        clock,	// src/main/scala/tile/aeq.scala:23:7
+               reset,	// src/main/scala/tile/aeq.scala:23:7
+               io_conv_en,	// src/main/scala/tile/aeq.scala:24:16
+               io_pipe_stall,	// src/main/scala/tile/aeq.scala:24:16
+  output       io_conv_done,	// src/main/scala/tile/aeq.scala:24:16
+  output [9:0] io_ai_rdaddr_0,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_1,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_2,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_3,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_4,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_5,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_6,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_7,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rdaddr_8,	// src/main/scala/tile/aeq.scala:24:16
+  input  [9:0] io_ai_rddata_0,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_1,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_2,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_3,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_4,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_5,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_6,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_7,	// src/main/scala/tile/aeq.scala:24:16
+               io_ai_rddata_8,	// src/main/scala/tile/aeq.scala:24:16
+  output [9:0] io_spike_event,	// src/main/scala/tile/aeq.scala:24:16
+  output       io_spike_valid	// src/main/scala/tile/aeq.scala:24:16
 );
 
-  reg  [3:0] aeq_read_col_sel_counter;	// src/main/scala/tile_test/aeq.scala:25:43
-  reg  [9:0] aeq_read_addr;	// src/main/scala/tile_test/aeq.scala:26:32
-  reg  [9:0] spike_event_reg;	// src/main/scala/tile_test/aeq.scala:28:34
-  reg        spike_valid_reg;	// src/main/scala/tile_test/aeq.scala:29:34
-  reg        eoq_bit_reg;	// src/main/scala/tile_test/aeq.scala:30:30
-  reg        conv_done_reg;	// src/main/scala/tile_test/aeq.scala:31:32
-  wire       read_en = aeq_read_col_sel_counter < 4'h9;	// src/main/scala/tile_test/aeq.scala:25:43, :46:35
-  wire       _GEN = aeq_read_col_sel_counter == 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_0 = aeq_read_col_sel_counter == 4'h1;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_1 = aeq_read_col_sel_counter == 4'h2;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_2 = aeq_read_col_sel_counter == 4'h3;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_3 = aeq_read_col_sel_counter == 4'h4;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_4 = aeq_read_col_sel_counter == 4'h5;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_5 = aeq_read_col_sel_counter == 4'h6;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_6 = aeq_read_col_sel_counter == 4'h7;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  wire       _GEN_7 = aeq_read_col_sel_counter == 4'h8;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48
-  always @(posedge clock) begin	// src/main/scala/tile_test/aeq.scala:22:7
-    if (reset) begin	// src/main/scala/tile_test/aeq.scala:22:7
-      aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-      aeq_read_addr <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32
-      spike_event_reg <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32, :28:34
-      spike_valid_reg <= 1'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :29:34
-      eoq_bit_reg <= 1'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :30:30
-      conv_done_reg <= 1'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :31:32
+  reg  [3:0] aeq_read_col_sel_counter;	// src/main/scala/tile/aeq.scala:26:43
+  reg  [9:0] aeq_read_addr;	// src/main/scala/tile/aeq.scala:27:32
+  reg  [9:0] spike_event_reg;	// src/main/scala/tile/aeq.scala:29:34
+  reg        spike_valid_reg;	// src/main/scala/tile/aeq.scala:30:34
+  reg        conv_done_reg;	// src/main/scala/tile/aeq.scala:32:32
+  wire       read_en = aeq_read_col_sel_counter < 4'h9;	// src/main/scala/tile/aeq.scala:26:43, :47:35
+  wire       _GEN = aeq_read_col_sel_counter == 4'h0;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_0 = aeq_read_col_sel_counter == 4'h1;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_1 = aeq_read_col_sel_counter == 4'h2;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_2 = aeq_read_col_sel_counter == 4'h3;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_3 = aeq_read_col_sel_counter == 4'h4;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_4 = aeq_read_col_sel_counter == 4'h5;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_5 = aeq_read_col_sel_counter == 4'h6;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_6 = aeq_read_col_sel_counter == 4'h7;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  wire       _GEN_7 = aeq_read_col_sel_counter == 4'h8;	// src/main/scala/tile/aeq.scala:26:43, :48:48
+  always @(posedge clock) begin	// src/main/scala/tile/aeq.scala:23:7
+    if (reset) begin	// src/main/scala/tile/aeq.scala:23:7
+      aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+      aeq_read_addr <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32
+      spike_event_reg <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32, :29:34
+      spike_valid_reg <= 1'h0;	// src/main/scala/tile/aeq.scala:23:7, :30:34
+      conv_done_reg <= 1'h0;	// src/main/scala/tile/aeq.scala:23:7, :32:32
     end
-    else begin	// src/main/scala/tile_test/aeq.scala:22:7
-      automatic logic [9:0] selected_data;	// src/main/scala/tile_test/aeq.scala:54:48, :55:27
-      automatic logic       _GEN_8 = io_conv_en & read_en;	// src/main/scala/tile_test/aeq.scala:46:35, :62:21
+    else begin	// src/main/scala/tile/aeq.scala:23:7
+      automatic logic [9:0] selected_data;	// src/main/scala/tile/aeq.scala:55:48, :56:27
+      automatic logic       _GEN_8 = io_conv_en & read_en;	// src/main/scala/tile/aeq.scala:47:35, :63:21
       selected_data =
         _GEN_7
           ? io_ai_rddata_8
@@ -123,63 +121,62 @@ module AeqReadStage(	// src/main/scala/tile_test/aeq.scala:22:7
                                   ? io_ai_rddata_2
                                   : _GEN_0
                                       ? io_ai_rddata_1
-                                      : _GEN ? io_ai_rddata_0 : 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32, :47:48, :52:19, :54:48, :55:27
-      if (_GEN_8) begin	// src/main/scala/tile_test/aeq.scala:62:21
-        if (selected_data[9]) begin	// src/main/scala/tile_test/aeq.scala:54:48, :55:27, :60:32
-          if (_GEN_7)	// src/main/scala/tile_test/aeq.scala:47:48
-            aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-          else	// src/main/scala/tile_test/aeq.scala:47:48
-            aeq_read_col_sel_counter <= aeq_read_col_sel_counter + 4'h1;	// src/main/scala/tile_test/aeq.scala:25:43, :47:48, :73:70
+                                      : _GEN ? io_ai_rddata_0 : 10'h0;	// src/main/scala/tile/aeq.scala:27:32, :48:48, :53:19, :55:48, :56:27
+      if (_GEN_8) begin	// src/main/scala/tile/aeq.scala:63:21
+        if (selected_data[9]) begin	// src/main/scala/tile/aeq.scala:55:48, :56:27, :61:32
+          if (_GEN_7)	// src/main/scala/tile/aeq.scala:48:48
+            aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+          else if (io_pipe_stall) begin	// src/main/scala/tile/aeq.scala:24:16
+          end
+          else	// src/main/scala/tile/aeq.scala:24:16
+            aeq_read_col_sel_counter <= aeq_read_col_sel_counter + 4'h1;	// src/main/scala/tile/aeq.scala:26:43, :48:48, :75:74
         end
-        spike_event_reg <= selected_data;	// src/main/scala/tile_test/aeq.scala:28:34, :54:48, :55:27
-        spike_valid_reg <= selected_data[0];	// src/main/scala/tile_test/aeq.scala:29:34, :54:48, :55:27, :59:36
-        eoq_bit_reg <= selected_data[9];	// src/main/scala/tile_test/aeq.scala:30:30, :54:48, :55:27, :60:32
+        spike_event_reg <= selected_data;	// src/main/scala/tile/aeq.scala:29:34, :55:48, :56:27
+        spike_valid_reg <= selected_data[0];	// src/main/scala/tile/aeq.scala:30:34, :55:48, :56:27, :60:36
       end
-      else	// src/main/scala/tile_test/aeq.scala:62:21
-        aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile_test/aeq.scala:25:43
-      if (~_GEN_8 | selected_data[9])	// src/main/scala/tile_test/aeq.scala:54:48, :55:27, :60:32, :62:{21,33}, :67:23, :80:23
-        aeq_read_addr <= 10'h0;	// src/main/scala/tile_test/aeq.scala:26:32
-      else if (selected_data[0])	// src/main/scala/tile_test/aeq.scala:54:48, :55:27, :59:36
-        aeq_read_addr <= aeq_read_addr + 10'h1;	// src/main/scala/tile_test/aeq.scala:26:32, :76:44
-      conv_done_reg <= _GEN_8 & selected_data[9] & _GEN_7 | conv_done_reg;	// src/main/scala/tile_test/aeq.scala:31:32, :47:48, :54:48, :55:27, :60:32, :62:{21,33}, :67:23, :69:52, :70:31
+      else	// src/main/scala/tile/aeq.scala:63:21
+        aeq_read_col_sel_counter <= 4'h0;	// src/main/scala/tile/aeq.scala:26:43
+      if (~_GEN_8 | selected_data[9])	// src/main/scala/tile/aeq.scala:55:48, :56:27, :61:32, :63:{21,33}, :68:23, :89:23
+        aeq_read_addr <= 10'h0;	// src/main/scala/tile/aeq.scala:27:32
+      else if (selected_data[0] & ~io_pipe_stall)	// src/main/scala/tile/aeq.scala:27:32, :55:48, :56:27, :60:36, :74:22, :80:33, :81:33, :82:31, :84:31
+        aeq_read_addr <= aeq_read_addr + 10'h1;	// src/main/scala/tile/aeq.scala:27:32, :82:48
+      conv_done_reg <= _GEN_8 & selected_data[9] & _GEN_7 | conv_done_reg;	// src/main/scala/tile/aeq.scala:32:32, :48:48, :55:48, :56:27, :61:32, :63:{21,33}, :68:23, :70:52, :71:31
     end
   end // always @(posedge)
-  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/tile_test/aeq.scala:22:7
-    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
-      `FIRRTL_BEFORE_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
+  `ifdef ENABLE_INITIAL_REG_	// src/main/scala/tile/aeq.scala:23:7
+    `ifdef FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/aeq.scala:23:7
+      `FIRRTL_BEFORE_INITIAL	// src/main/scala/tile/aeq.scala:23:7
     `endif // FIRRTL_BEFORE_INITIAL
-    initial begin	// src/main/scala/tile_test/aeq.scala:22:7
-      automatic logic [31:0] _RANDOM[0:0];	// src/main/scala/tile_test/aeq.scala:22:7
-      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/tile_test/aeq.scala:22:7
-        `INIT_RANDOM_PROLOG_	// src/main/scala/tile_test/aeq.scala:22:7
+    initial begin	// src/main/scala/tile/aeq.scala:23:7
+      automatic logic [31:0] _RANDOM[0:0];	// src/main/scala/tile/aeq.scala:23:7
+      `ifdef INIT_RANDOM_PROLOG_	// src/main/scala/tile/aeq.scala:23:7
+        `INIT_RANDOM_PROLOG_	// src/main/scala/tile/aeq.scala:23:7
       `endif // INIT_RANDOM_PROLOG_
-      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/tile_test/aeq.scala:22:7
-        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// src/main/scala/tile_test/aeq.scala:22:7
-        aeq_read_col_sel_counter = _RANDOM[/*Zero width*/ 1'b0][3:0];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43
-        aeq_read_addr = _RANDOM[/*Zero width*/ 1'b0][13:4];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :26:32
-        spike_event_reg = _RANDOM[/*Zero width*/ 1'b0][23:14];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :28:34
-        spike_valid_reg = _RANDOM[/*Zero width*/ 1'b0][24];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :29:34
-        eoq_bit_reg = _RANDOM[/*Zero width*/ 1'b0][25];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :30:30
-        conv_done_reg = _RANDOM[/*Zero width*/ 1'b0][26];	// src/main/scala/tile_test/aeq.scala:22:7, :25:43, :31:32
+      `ifdef RANDOMIZE_REG_INIT	// src/main/scala/tile/aeq.scala:23:7
+        _RANDOM[/*Zero width*/ 1'b0] = `RANDOM;	// src/main/scala/tile/aeq.scala:23:7
+        aeq_read_col_sel_counter = _RANDOM[/*Zero width*/ 1'b0][3:0];	// src/main/scala/tile/aeq.scala:23:7, :26:43
+        aeq_read_addr = _RANDOM[/*Zero width*/ 1'b0][13:4];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :27:32
+        spike_event_reg = _RANDOM[/*Zero width*/ 1'b0][23:14];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :29:34
+        spike_valid_reg = _RANDOM[/*Zero width*/ 1'b0][24];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :30:34
+        conv_done_reg = _RANDOM[/*Zero width*/ 1'b0][26];	// src/main/scala/tile/aeq.scala:23:7, :26:43, :32:32
       `endif // RANDOMIZE_REG_INIT
     end // initial
-    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
-      `FIRRTL_AFTER_INITIAL	// src/main/scala/tile_test/aeq.scala:22:7
+    `ifdef FIRRTL_AFTER_INITIAL	// src/main/scala/tile/aeq.scala:23:7
+      `FIRRTL_AFTER_INITIAL	// src/main/scala/tile/aeq.scala:23:7
     `endif // FIRRTL_AFTER_INITIAL
   `endif // ENABLE_INITIAL_REG_
-  assign io_conv_done = conv_done_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :31:32
-  assign io_ai_rdaddr_0 = read_en & _GEN ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_1 = read_en & _GEN_0 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_2 = read_en & _GEN_1 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_3 = read_en & _GEN_2 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_4 = read_en & _GEN_3 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_5 = read_en & _GEN_4 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_6 = read_en & _GEN_5 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_7 = read_en & _GEN_6 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_ai_rdaddr_8 = read_en & _GEN_7 ? aeq_read_addr : 10'h0;	// src/main/scala/tile_test/aeq.scala:22:7, :26:32, :43:25, :46:{35,42}, :47:48
-  assign io_spike_event = spike_event_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :28:34
-  assign io_spike_valid = spike_valid_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :29:34
-  assign io_eoq_bit = eoq_bit_reg;	// src/main/scala/tile_test/aeq.scala:22:7, :30:30
+  assign io_conv_done = conv_done_reg;	// src/main/scala/tile/aeq.scala:23:7, :32:32
+  assign io_ai_rdaddr_0 = read_en & _GEN ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_1 = read_en & _GEN_0 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_2 = read_en & _GEN_1 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_3 = read_en & _GEN_2 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_4 = read_en & _GEN_3 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_5 = read_en & _GEN_4 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_6 = read_en & _GEN_5 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_7 = read_en & _GEN_6 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_ai_rdaddr_8 = read_en & _GEN_7 ? aeq_read_addr : 10'h0;	// src/main/scala/tile/aeq.scala:23:7, :27:32, :44:25, :47:{35,42}, :48:48
+  assign io_spike_event = spike_event_reg;	// src/main/scala/tile/aeq.scala:23:7, :29:34
+  assign io_spike_valid = spike_valid_reg;	// src/main/scala/tile/aeq.scala:23:7, :30:34
 endmodule
 
 // external module tdpb_init
@@ -200,38 +197,39 @@ endmodule
 
 // external module tdpb_init
 
-module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
-  input        clock,	// src/main/scala/tile_test/aeq.scala:85:7
-               reset,	// src/main/scala/tile_test/aeq.scala:85:7
-               io_conv_en,	// src/main/scala/tile_test/aeq.scala:86:16
-  output       io_conv_done,	// src/main/scala/tile_test/aeq.scala:86:16
-  output [9:0] io_spike_event,	// src/main/scala/tile_test/aeq.scala:86:16
-  output       io_spike_valid,	// src/main/scala/tile_test/aeq.scala:86:16
-               io_eoq_bit	// src/main/scala/tile_test/aeq.scala:86:16
+module TopLevelModule(	// src/main/scala/tile/aeq.scala:94:7
+  input        clock,	// src/main/scala/tile/aeq.scala:94:7
+               reset,	// src/main/scala/tile/aeq.scala:94:7
+               io_conv_en,	// src/main/scala/tile/aeq.scala:95:16
+               io_pipe_stall,	// src/main/scala/tile/aeq.scala:95:16
+  output       io_conv_done,	// src/main/scala/tile/aeq.scala:95:16
+  output [9:0] io_spike_event,	// src/main/scala/tile/aeq.scala:95:16
+  output       io_spike_valid	// src/main/scala/tile/aeq.scala:95:16
 );
 
-  wire [9:0] _tdpb_init_8_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_7_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_6_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_5_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_4_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_3_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_2_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_1_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _tdpb_init_doa;	// src/main/scala/tile_test/aeq.scala:105:31
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_0;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_1;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_2;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_3;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_4;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_5;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_6;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_7;	// src/main/scala/tile_test/aeq.scala:95:30
-  wire [9:0] _aeqReadStage_io_ai_rdaddr_8;	// src/main/scala/tile_test/aeq.scala:95:30
-  AeqReadStage aeqReadStage (	// src/main/scala/tile_test/aeq.scala:95:30
+  wire [9:0] _tdpb_init_8_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_7_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_6_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_5_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_4_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_3_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_2_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_1_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _tdpb_init_doa;	// src/main/scala/tile/aeq.scala:116:31
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_0;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_1;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_2;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_3;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_4;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_5;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_6;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_7;	// src/main/scala/tile/aeq.scala:105:30
+  wire [9:0] _aeqReadStage_io_ai_rdaddr_8;	// src/main/scala/tile/aeq.scala:105:30
+  AeqReadStage aeqReadStage (	// src/main/scala/tile/aeq.scala:105:30
     .clock          (clock),
     .reset          (reset),
     .io_conv_en     (io_conv_en),
+    .io_pipe_stall  (io_pipe_stall),
     .io_conv_done   (io_conv_done),
     .io_ai_rdaddr_0 (_aeqReadStage_io_ai_rdaddr_0),
     .io_ai_rdaddr_1 (_aeqReadStage_io_ai_rdaddr_1),
@@ -242,34 +240,33 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .io_ai_rdaddr_6 (_aeqReadStage_io_ai_rdaddr_6),
     .io_ai_rdaddr_7 (_aeqReadStage_io_ai_rdaddr_7),
     .io_ai_rdaddr_8 (_aeqReadStage_io_ai_rdaddr_8),
-    .io_ai_rddata_0 (_tdpb_init_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_1 (_tdpb_init_1_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_2 (_tdpb_init_2_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_3 (_tdpb_init_3_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_4 (_tdpb_init_4_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_5 (_tdpb_init_5_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_6 (_tdpb_init_6_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_7 (_tdpb_init_7_doa),	// src/main/scala/tile_test/aeq.scala:105:31
-    .io_ai_rddata_8 (_tdpb_init_8_doa),	// src/main/scala/tile_test/aeq.scala:105:31
+    .io_ai_rddata_0 (_tdpb_init_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_1 (_tdpb_init_1_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_2 (_tdpb_init_2_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_3 (_tdpb_init_3_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_4 (_tdpb_init_4_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_5 (_tdpb_init_5_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_6 (_tdpb_init_6_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_7 (_tdpb_init_7_doa),	// src/main/scala/tile/aeq.scala:116:31
+    .io_ai_rddata_8 (_tdpb_init_8_doa),	// src/main/scala/tile/aeq.scala:116:31
     .io_spike_event (io_spike_event),
-    .io_spike_valid (io_spike_valid),
-    .io_eoq_bit     (io_eoq_bit)
+    .io_spike_valid (io_spike_valid)
   );
   tdpb_init #(
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_0.mem")
-  ) tdpb_init (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_0),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_0),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_doa),
     .dob   (/* unused */)
   );
@@ -277,17 +274,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_1.mem")
-  ) tdpb_init_1 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_1 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_1),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_1),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_1_doa),
     .dob   (/* unused */)
   );
@@ -295,17 +292,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_2.mem")
-  ) tdpb_init_2 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_2 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_2),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_2),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_2_doa),
     .dob   (/* unused */)
   );
@@ -313,17 +310,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_3.mem")
-  ) tdpb_init_3 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_3 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_3),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_3),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_3_doa),
     .dob   (/* unused */)
   );
@@ -331,17 +328,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_4.mem")
-  ) tdpb_init_4 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_4 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_4),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_4),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_4_doa),
     .dob   (/* unused */)
   );
@@ -349,17 +346,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_5.mem")
-  ) tdpb_init_5 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_5 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_5),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_5),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_5_doa),
     .dob   (/* unused */)
   );
@@ -367,17 +364,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_6.mem")
-  ) tdpb_init_6 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_6 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_6),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_6),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_6_doa),
     .dob   (/* unused */)
   );
@@ -385,17 +382,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_7.mem")
-  ) tdpb_init_7 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_7 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_7),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_7),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_7_doa),
     .dob   (/* unused */)
   );
@@ -403,17 +400,17 @@ module TopLevelModule(	// src/main/scala/tile_test/aeq.scala:85:7
     .ADDR_WIDTH(10),
     .DATA_WIDTH(10),
     .INIT_FILE("ai_8.mem")
-  ) tdpb_init_8 (	// src/main/scala/tile_test/aeq.scala:105:31
+  ) tdpb_init_8 (	// src/main/scala/tile/aeq.scala:116:31
     .clka  (clock),
-    .clkb  (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .ena   (1'h1),	// src/main/scala/tile_test/aeq.scala:116:22
-    .enb   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .wea   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .web   (1'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .addra (_aeqReadStage_io_ai_rdaddr_8),	// src/main/scala/tile_test/aeq.scala:95:30
-    .addrb (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dia   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
-    .dib   (10'h0),	// src/main/scala/tile_test/aeq.scala:107:18
+    .clkb  (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .ena   (1'h1),	// src/main/scala/tile/aeq.scala:130:22
+    .enb   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .wea   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .web   (1'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .addra (_aeqReadStage_io_ai_rdaddr_8),	// src/main/scala/tile/aeq.scala:105:30
+    .addrb (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dia   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
+    .dib   (10'h0),	// src/main/scala/tile/aeq.scala:118:18
     .doa   (_tdpb_init_8_doa),
     .dob   (/* unused */)
   );
